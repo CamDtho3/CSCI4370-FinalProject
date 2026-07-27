@@ -1,0 +1,224 @@
+/* Reference component — copy this file's shape for new components.
+   Every value comes from a token. No raw hex, no arbitrary px. */
+
+.card {
+  display: block;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--duration) var(--ease),
+              box-shadow var(--duration) var(--ease),
+              transform var(--duration) var(--ease);
+}
+
+.card:hover {
+  border-color: var(--c-border-strong);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+/* --- Image ------------------------------------------------------
+   Fixed 3:2 ratio so a grid of cards stays aligned regardless of
+   the source images' dimensions.
+   ----------------------------------------------------------------- */
+
+.media {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  background: var(--c-surface-sunken);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Shown when the image is missing or fails to load. */
+.placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--c-surface-sunken);
+  color: var(--c-text-muted);
+  font-size: var(--text-sm);
+}
+
+/* Overlay chip, top-left of the image — cuisine or a status. */
+.tag {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  background: var(--c-surface);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--c-text);
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- Banner -----------------------------------------------------
+   Name on the left, rating or price on the right. Sits below the
+   image rather than over it — text on photography is a contrast
+   gamble that varies per image.
+   ----------------------------------------------------------------- */
+
+/* Wraps the banner and meta rows so the hover wash covers both. */
+.info {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Colour wash that sweeps in from the left on hover. Sits behind the
+   text, and stays pale so contrast never depends on the animation
+   having finished. */
+.info::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--c-accent-subtle);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration) var(--ease);
+}
+
+.card:hover .info::before {
+  transform: scaleX(1);
+}
+
+/* Accent bar along the bottom edge, sweeping with the wash. */
+.info::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--c-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration) var(--ease);
+}
+
+.card:hover .info::after {
+  transform: scaleX(1);
+}
+
+.banner {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+
+.name {
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-snug);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color var(--duration) var(--ease);
+}
+
+.card:hover .name {
+  color: var(--c-accent);
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--c-text);
+  flex-shrink: 0;
+}
+
+.star {
+  color: var(--c-accent);
+  flex-shrink: 0;
+}
+
+.count {
+  color: var(--c-text-muted);
+}
+
+.newBadge {
+  font-size: var(--text-xs);
+  color: var(--c-accent);
+  background: var(--c-accent-subtle);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  flex-shrink: 0;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-4) var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--c-text-muted);
+}
+
+.dot {
+  width: 2px;
+  height: 2px;
+  border-radius: var(--radius-full);
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+/* --- Slots ------------------------------------------------------- */
+
+.slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.slot {
+  height: var(--control-height-sm);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--c-border-input);
+  border-radius: var(--radius);
+  background: var(--c-surface);
+  font-size: var(--text-sm);
+  transition: border-color var(--duration-fast) var(--ease),
+              background var(--duration-fast) var(--ease);
+}
+
+.slot:hover:not(:disabled) {
+  border-color: var(--c-accent);
+  background: var(--c-accent-subtle);
+}
+
+.slot:disabled {
+  color: var(--c-text-muted);
+  background: var(--c-surface-sunken);
+  border-color: var(--c-border);
+  text-decoration: line-through;
+}
+
+.slotSelected,
+.slotSelected:hover {
+  background: var(--c-accent);
+  border-color: var(--c-accent);
+  color: var(--c-text-inverse);
+  font-weight: var(--weight-medium);
+}
+
+.noSlots {
+  padding: 0 var(--space-4) var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--c-text-muted);
+}

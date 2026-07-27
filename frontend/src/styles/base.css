@@ -1,0 +1,127 @@
+/* ===================================================================
+   Base — reset and global element defaults
+   Loaded once, after tokens. Component styling goes in .module.css
+   files, not here.
+   =================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: var(--weight-normal);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Headings ----------------------------------------------------
+   Sizes are set here so components don't each invent their own.
+   Sentence case throughout — no Title Case, no ALL CAPS.
+   ----------------------------------------------------------------- */
+
+h1, h2, h3, h4 {
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  text-wrap: balance;
+}
+
+h1 { font-size: var(--text-2xl); }
+h2 { font-size: var(--text-xl); }
+h3 { font-size: var(--text-lg); letter-spacing: var(--tracking-normal); }
+h4 { font-size: var(--text-md); letter-spacing: var(--tracking-normal); }
+
+p {
+  text-wrap: pretty;
+}
+
+/* --- Media -------------------------------------------------------- */
+
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* --- Forms -------------------------------------------------------
+   Inherit type rather than falling back to the browser default.
+   ----------------------------------------------------------------- */
+
+input, button, textarea, select {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* --- Links -------------------------------------------------------- */
+
+a {
+  color: var(--c-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+a:hover {
+  color: var(--c-accent-hover);
+}
+
+/* --- Focus -------------------------------------------------------
+   Visible for keyboard users, absent for mouse users. Never remove
+   this without replacing it.
+   ----------------------------------------------------------------- */
+
+:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* --- Utility ------------------------------------------------------ */
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,0 +1,67 @@
+.section {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: var(--space-10) var(--space-6) 0;
+}
+
+.section:last-of-type {
+  padding-bottom: var(--space-16);
+}
+
+/* The whole header row is the toggle, so the hit target is generous. */
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) 0;
+  margin-bottom: var(--space-5);
+  text-align: left;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.head:hover .title {
+  color: var(--c-accent);
+}
+
+.title {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-tight);
+  transition: color var(--duration-fast) var(--ease);
+}
+
+.count {
+  font-size: var(--text-sm);
+  color: var(--c-text-muted);
+  margin-right: auto;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--c-accent);
+  flex-shrink: 0;
+}
+
+.chevron {
+  transition: transform var(--duration) var(--ease);
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: var(--space-5);
+}
+
+.empty {
+  padding: var(--space-10) 0;
+  text-align: center;
+  color: var(--c-text-muted);
+}
