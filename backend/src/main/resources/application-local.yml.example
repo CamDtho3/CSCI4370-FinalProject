@@ -1,0 +1,8 @@
+# Copy to application-local.yml (gitignored) to override local settings,
+# e.g. if your Postgres isn't the docker-compose default.
+#
+# spring:
+#   datasource:
+#     url: jdbc:postgresql://localhost:5432/reservex
+#     username: reservex
+#     password: reservex
