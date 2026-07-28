@@ -1,0 +1,133 @@
+.wrap {
+  padding: var(--space-10) 0 var(--space-16);
+}
+
+.card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+}
+
+.title {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-tight);
+  margin-bottom: var(--space-2);
+}
+
+.subtitle {
+  font-size: var(--text-base);
+  color: var(--c-text-secondary);
+  margin-bottom: var(--space-6);
+}
+
+/* --- Account type ------------------------------------------------
+   Native radios, visually hidden. Keeps arrow-key navigation and
+   screen-reader semantics without styling the inputs themselves.
+   ------------------------------------------------------------------ */
+
+.typeGroup {
+  margin-bottom: var(--space-6);
+}
+
+.typeLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  margin-bottom: var(--space-2);
+}
+
+.typeOptions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.typeInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.typeOption {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-3) var(--space-4);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border-input);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease),
+              background var(--duration-fast) var(--ease);
+}
+
+.typeOption:hover {
+  border-color: var(--c-border-strong);
+}
+
+.typeInput:checked + .typeOption {
+  border-color: var(--c-accent);
+  background: var(--c-accent-subtle);
+}
+
+.typeInput:focus-visible + .typeOption {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+.typeName {
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+}
+
+.typeHint {
+  font-size: var(--text-sm);
+  color: var(--c-text-secondary);
+}
+
+/* --- Employer block ----------------------------------------------
+   Only rendered for restaurant accounts. Set apart so it reads as a
+   consequence of the choice above rather than another ordinary field.
+   ------------------------------------------------------------------ */
+
+.employer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-5);
+  margin-bottom: var(--space-6);
+  background: var(--c-surface-sunken);
+  border-radius: var(--radius);
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin-bottom: var(--space-6);
+}
+
+.footer {
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--c-border);
+  text-align: center;
+  font-size: var(--text-base);
+  color: var(--c-text-secondary);
+}
+
+.footerLink {
+  color: var(--c-accent);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+}
+
+.footerLink:hover {
+  text-decoration: underline;
+}

@@ -26,7 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       user,
-      isStaff: user?.userRole === 'STAFF' || user?.userRole === 'REST_ADMIN',
+      isStaff: user?.userRole === 'STAFF',
       signIn: setUser,
       signOut: () => setUser(null),
     }),

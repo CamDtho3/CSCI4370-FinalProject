@@ -11,7 +11,7 @@
 
 export type PriceRange = 1 | 2 | 3 | 4
 
-export type UserRole = 'DINER' | 'STAFF' | 'REST_ADMIN' | 'PLATFORM_ADMIN'
+export type UserRole = 'DINER' | 'STAFF'
 
 /**
  * The signed-in account — what GET /api/auth/me returns, and what
