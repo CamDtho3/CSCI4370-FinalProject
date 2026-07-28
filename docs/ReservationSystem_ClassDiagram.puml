@@ -1,0 +1,107 @@
+@startuml ReservationSystem
+
+' To view the diagram, install the PlantUML extension in VSCode
+' Then press alt + d to render the uml diagram in VSCode
+
+skinparam classFontStyle bold
+skinparam classAttributeIconSize 0
+skinparam backgroundColor white
+skinparam nodesep 60
+skinparam ranksep 85
+skinparam linetype polyline
+hide circle
+
+' ─── Level 1: Base / Hub Entities ─────────────────────────────────
+
+class User {
+  {field} + <u>email</u> : VARCHAR(255)
+  {field} + pwd_hash : VARCHAR(255)
+  {field} + user_role : ENUM(diner, staff,
+  {field}   rest_admin, platform_admin)
+  {field} + fname : VARCHAR(100)
+  {field} + lname : VARCHAR(100)
+  {field} + user_phone : VARCHAR(20)
+  {field} + acct_created : DATETIME
+}
+
+class Restaurant {
+  {field} + <u>rest_phone</u> : VARCHAR(20)
+  {field} + rest_name : VARCHAR(255)
+  {field} + street : VARCHAR(255)
+  {field} + zip : VARCHAR(10)
+  {field} + city : VARCHAR(100)
+  {field} + state : VARCHAR(50)
+  {field} + cuisine : VARCHAR(100)
+  {field} + price_range : ENUM(1,2,3,4)
+  {field} + image_url : VARCHAR(255)
+  {field} + rest_created : DATETIME
+}
+
+' ─── Level 2: Restaurant Configuration ────────────────────────────
+
+class RestaurantHours {
+  {field} + <u>day_of_week</u> : ENUM(0-6)
+  {field} + open_time : TIME
+  {field} + close_time : TIME
+  {field} + is_closed : BOOLEAN
+}
+
+class TimeSlot {
+  {field} + <u>slot_date</u> : DATE
+  {field} + <u>slot_time</u> : TIME
+  {field} + slot_capacity : INT
+  {field} + /available_spots : INT
+}
+
+' ─── Level 3: Transactional Entities ──────────────────────────────
+
+class Reservation {
+  {field} + <u>res_num</u> : VARCHAR(20)
+  {field} + party_size : INT
+  {field} + special_req : TEXT
+  {field} + res_status : ENUM(pending, confirmed, seated,
+  {field}   completed, cancelled, no_show)
+  {field} + res_created : DATETIME
+}
+
+' ─── Level 4: Post-Visit Entities ─────────────────────────────────
+
+class ReservationStatusHistory {
+  {field} + <u>changed_at</u> : DATETIME
+  {field} + changed_to : ENUM(pending, confirmed, seated,
+  {field}   completed, cancelled, no_show)
+}
+
+class Review {
+  {field} + rating : INT
+  {field} + comment : TEXT
+  {field} + review_created : DATETIME
+}
+
+' ─── Associations ─────────────────────────────────────────────────
+'  Where a class's identity is partly supplied by its parent, the
+'  association completes the key. e.g. RestaurantHours is identified
+'  by (rest_phone, day_of_week) — FD D1-D3.
+
+Restaurant  "1..1" <-- "1..*" RestaurantHours
+Restaurant  "1..1" <-- "0..*" TimeSlot
+
+' FD I1-I3: Review is identified by (email, rest_phone) — both halves
+' of its key arrive through these two associations.
+Restaurant  "1..1" <-- "0..*" Review : about >
+
+' FD A7: email -> employer_phone (null for diners / platform admins)
+Restaurant  "0..1" <-- "0..*" User : employs <
+
+' Diner-side links — restricted to user_role = 'diner' by CHECK
+User        "1..1" <-- "0..*" Reservation : booked by >
+User        "1..1" <-- "0..*" Review : written by >
+
+TimeSlot    "1..1" <-- "0..*" Reservation
+
+Reservation "1..1" <-- "1..*" ReservationStatusHistory
+
+' Audit trail: who performed the status change (FD G2, changed_by)
+User        "1..1" <-- "0..*" ReservationStatusHistory : changed by >
+
+@enduml

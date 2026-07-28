@@ -62,7 +62,10 @@ export default function BookingConfirm() {
         },
         user!.email,
       )
-      navigate(`/reservations/${created.resNum}`, { replace: true })
+      navigate(`/reservations/${created.resNum}`, {
+        replace: true,
+        state: { justBooked: true },
+      })
     } catch (err) {
       if (err instanceof MockApiError && err.code === 'SLOT_FULL') {
         // Someone booked between page load and submit. Send them back

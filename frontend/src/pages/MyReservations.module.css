@@ -1,0 +1,128 @@
+.title {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-tight);
+  margin-bottom: var(--space-8);
+}
+
+.group {
+  margin-bottom: var(--space-10);
+}
+
+.groupTitle {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--c-text-muted);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--c-border);
+  margin-bottom: var(--space-4);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--duration-fast) var(--ease),
+              box-shadow var(--duration-fast) var(--ease);
+}
+
+.row:hover {
+  border-color: var(--c-border-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.past {
+  background: transparent;
+}
+
+/* Date block on the left — the thing people scan for. */
+.when {
+  flex-shrink: 0;
+  width: 4.5rem;
+  text-align: center;
+}
+
+.month {
+  font-size: var(--text-xs);
+  color: var(--c-text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+.day {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-tight);
+}
+
+.divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--c-border);
+  flex-shrink: 0;
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+}
+
+.restName {
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detail {
+  font-size: var(--text-sm);
+  color: var(--c-text-secondary);
+}
+
+.trailing {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-shrink: 0;
+}
+
+.resNum {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--c-text-muted);
+}
+
+/* --- Empty -------------------------------------------------------- */
+
+.empty {
+  padding: var(--space-16) var(--space-6);
+  text-align: center;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+}
+
+.emptyTitle {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-medium);
+  margin-bottom: var(--space-2);
+}
+
+.emptyBody {
+  color: var(--c-text-secondary);
+  margin-bottom: var(--space-6);
+}

@@ -11,6 +11,30 @@
 
 export type PriceRange = 1 | 2 | 3 | 4
 
+export type UserRole = 'DINER' | 'STAFF' | 'REST_ADMIN' | 'PLATFORM_ADMIN'
+
+/**
+ * The signed-in account — what GET /api/auth/me returns, and what
+ * login and signup respond with.
+ *
+ * pwd_hash and acct_created exist on the User table but are
+ * deliberately absent here: one must never leave the server, the
+ * other has no use in the UI.
+ */
+export interface CurrentUser {
+  email: string
+  fname: string
+  lname: string
+  /** Optional at signup, so null is a real value here. */
+  userPhone: string | null
+  userRole: UserRole
+  /**
+   * Restaurant this account works for, resolved through FD A7
+   * (email → employer_phone). Absent for diners and platform admins.
+   */
+  employerName?: string
+}
+
 export interface RestaurantResponse {
   /** Natural key — FD group B. Also the URL segment. */
   restPhone: string
@@ -65,6 +89,15 @@ export interface ReservationRequest {
   specialReq?: string
 }
 
+/** One row of ReservationStatusHistory — FD group G. */
+export interface StatusHistoryEntry {
+  /** ISO timestamp. With resNum this forms the composite key. */
+  changedAt: string
+  changedTo: ReservationStatus
+  /** Email of the user who made the change — FD G2, changed_by. */
+  changedBy: string
+}
+
 export interface ReservationResponse {
   /** Natural key — FD group F. Shown to the diner as their confirmation. */
   resNum: string
@@ -76,4 +109,16 @@ export interface ReservationResponse {
   specialReq: string | null
   resStatus: ReservationStatus
   resCreated: string
+}
+
+/**
+ * What staff see. Deliberately a different shape from the diner-facing
+ * response: it carries the guest's identity, which a diner has no
+ * business receiving about anyone else's booking.
+ */
+export interface StaffReservationResponse extends ReservationResponse {
+  dinerName: string
+  dinerEmail: string
+  dinerPhone: string | null
+  history: StatusHistoryEntry[]
 }
