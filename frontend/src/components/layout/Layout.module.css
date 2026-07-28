@@ -1,0 +1,34 @@
+.main {
+  flex: 1;
+  width: 100%;
+}
+
+.container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: var(--space-10) var(--space-6) var(--space-16);
+}
+
+.narrow {
+  max-width: var(--container-narrow);
+}
+
+/* Landing page — full bleed so the hero's background reaches the
+   viewport edges. Home manages its own inner widths and padding. */
+.flush {
+  padding: 0;
+  max-width: none;
+}
+
+.footer {
+  border-top: 1px solid var(--c-border);
+}
+
+.footerInner {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-6);
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--c-text-muted);
+}

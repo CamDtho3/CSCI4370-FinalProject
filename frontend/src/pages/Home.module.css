@@ -1,0 +1,37 @@
+/* The Layout gives the home route a flush, full-width container, so
+   this page manages its own horizontal rhythm. */
+
+.hero {
+  background: var(--c-hero);
+}
+
+.heroInner {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: var(--space-16) var(--space-6) var(--space-12);
+  text-align: center;
+}
+
+.title {
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--c-text-inverse);
+  margin-bottom: var(--space-3);
+}
+
+.subtitle {
+  font-size: var(--text-md);
+  color: var(--c-hero-accent);
+  max-width: 34rem;
+  margin: 0 auto var(--space-8);
+}
+
+/* The search card floats on the colour field — that contrast is what
+   makes it read as the primary action on the page. */
+.searchWrap {
+  max-width: 46rem;
+  margin: 0 auto;
+  text-align: left;
+}

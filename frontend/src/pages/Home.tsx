@@ -1,0 +1,58 @@
+import { useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useSearch } from '../context/SearchContext'
+import SearchFields from '../components/search/SearchFields'
+import CardSection from '../components/CardSection'
+import { mockRestaurantsWithSlots } from '../mocks/restaurants'
+import styles from './Home.module.css'
+
+function formatDate(iso: string): string {
+  return new Date(`${iso}T00:00:00`).toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
+export default function Home() {
+  const { query } = useSearch()
+  const navigate = useNavigate()
+
+  // Swap for a real fetch once /api/restaurants exists.
+  const restaurants = useMemo(
+    () => mockRestaurantsWithSlots(query.slotDate),
+    [query.slotDate],
+  )
+
+  // Unrated restaurants sort last rather than as zero.
+  const topRated = useMemo(
+    () =>
+      [...restaurants].sort(
+        (a, b) => (b.avgRating ?? -1) - (a.avgRating ?? -1),
+      ),
+    [restaurants],
+  )
+
+  return (
+    <>
+      <section className={styles.hero}>
+        <div className={styles.heroInner}>
+          <h1 className={styles.title}>Book a table in Athens</h1>
+          <p className={styles.subtitle}>
+            Find a spot for tonight, this weekend, or whenever you're free.
+          </p>
+          <div className={styles.searchWrap}>
+            <SearchFields hero onSubmit={() => navigate('/search')} />
+          </div>
+        </div>
+      </section>
+
+      <CardSection
+        title={`Available ${formatDate(query.slotDate)}`}
+        restaurants={restaurants}
+      />
+
+      <CardSection title="Top rated" restaurants={topRated} />
+    </>
+  )
+}

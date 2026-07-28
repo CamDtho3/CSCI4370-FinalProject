@@ -1,0 +1,86 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: var(--control-height);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius);
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-snug);
+  white-space: nowrap;
+  transition: background var(--duration-fast) var(--ease),
+              border-color var(--duration-fast) var(--ease),
+              color var(--duration-fast) var(--ease);
+}
+
+.button:disabled {
+  background: var(--c-surface-sunken);
+  border-color: transparent;
+  color: var(--c-text-muted);
+}
+
+/* --- Variants ----------------------------------------------------
+   One primary per screen. Everything else is secondary or ghost.
+   ----------------------------------------------------------------- */
+
+.primary {
+  background: var(--c-accent);
+  border: 1px solid var(--c-accent);
+  color: var(--c-text-inverse);
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--c-accent-hover);
+  border-color: var(--c-accent-hover);
+}
+
+.primary:active:not(:disabled) {
+  background: var(--c-accent-active);
+  border-color: var(--c-accent-active);
+}
+
+.secondary {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border-input);
+  color: var(--c-text);
+}
+
+.secondary:hover:not(:disabled) {
+  background: var(--c-surface-hover);
+  border-color: var(--c-border-strong);
+}
+
+.ghost {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--c-text-secondary);
+}
+
+.ghost:hover:not(:disabled) {
+  background: var(--c-surface-hover);
+  color: var(--c-text);
+}
+
+.danger {
+  background: var(--c-danger);
+  border: 1px solid var(--c-danger);
+  color: var(--c-text-inverse);
+}
+
+.danger:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+/* --- Sizes -------------------------------------------------------- */
+
+.sm {
+  height: var(--control-height-sm);
+  padding: 0 var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.fullWidth {
+  width: 100%;
+}

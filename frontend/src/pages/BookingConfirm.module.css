@@ -1,0 +1,126 @@
+.wrap {
+  padding: var(--space-10) 0 var(--space-16);
+}
+
+.title {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-tight);
+  margin-bottom: var(--space-6);
+}
+
+/* --- Summary ------------------------------------------------------ */
+
+.summary {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.summaryHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-2);
+}
+
+.restName {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-medium);
+}
+
+.change {
+  font-size: var(--text-sm);
+  color: var(--c-accent);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.change:hover {
+  text-decoration: underline;
+}
+
+.address {
+  font-size: var(--text-sm);
+  color: var(--c-text-muted);
+  margin-bottom: var(--space-5);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--c-border);
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  font-size: var(--text-base);
+}
+
+.rowLabel {
+  color: var(--c-text-secondary);
+}
+
+.rowValue {
+  font-weight: var(--weight-medium);
+  text-align: right;
+}
+
+/* --- Form --------------------------------------------------------- */
+
+.form {
+  margin-bottom: var(--space-6);
+}
+
+.policy {
+  padding: var(--space-4);
+  background: var(--c-surface-sunken);
+  border-radius: var(--radius);
+  font-size: var(--text-sm);
+  color: var(--c-text-secondary);
+  line-height: var(--leading-body);
+  margin-bottom: var(--space-6);
+}
+
+.error {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--c-danger-subtle);
+  border: 1px solid var(--c-danger-border);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-5);
+}
+
+.errorTitle {
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  color: var(--c-danger);
+}
+
+.errorBody {
+  font-size: var(--text-sm);
+  color: var(--c-danger);
+}
+
+/* --- Missing booking ---------------------------------------------- */
+
+.missing {
+  padding: var(--space-16) 0;
+  text-align: center;
+}
+
+.missingText {
+  color: var(--c-text-secondary);
+  margin-bottom: var(--space-5);
+}
