@@ -16,8 +16,7 @@ hide circle
 class User {
   {field} + <u>email</u> : VARCHAR(255)
   {field} + pwd_hash : VARCHAR(255)
-  {field} + user_role : ENUM(diner, staff,
-  {field}   rest_admin, platform_admin)
+  {field} + user_role : ENUM(diner, staff)
   {field} + fname : VARCHAR(100)
   {field} + lname : VARCHAR(100)
   {field} + user_phone : VARCHAR(20)
