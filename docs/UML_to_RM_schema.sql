@@ -69,10 +69,9 @@ CREATE TABLE UserAccount (
     FOREIGN KEY (employer_phone)
         REFERENCES Restaurant (rest_phone),
 
-    CHECK (user_role IN ('DINER', 'STAFF', 'REST_ADMIN', 'PLATFORM_ADMIN')),
+    CHECK (user_role IN ('DINER', 'STAFF')),
 
-    CHECK (employer_phone IS NULL
-           OR user_role IN ('STAFF', 'REST_ADMIN'))
+    CHECK (employer_phone IS NULL OR user_role = 'STAFF')
 );
 
 
