@@ -3,13 +3,20 @@ import Header from './Header'
 import styles from './Layout.module.css'
 
 /** Routes rendered at the narrow width — forms, auth, confirmation. */
-const NARROW_ROUTES = ['/login', '/signup', '/reservations/', '/book']
+const NARROW_PREFIXES = ['/login', '/signup', '/reservations/']
+
+function isNarrowRoute(pathname: string): boolean {
+  // Booking lives at /restaurants/:restPhone/book, so it matches on
+  // the tail rather than the head.
+  if (pathname.endsWith('/book')) return true
+  return NARROW_PREFIXES.some((r) => pathname.startsWith(r))
+}
 
 export default function Layout() {
   const { pathname } = useLocation()
 
   const isHome = pathname === '/'
-  const isNarrow = NARROW_ROUTES.some((r) => pathname.startsWith(r))
+  const isNarrow = isNarrowRoute(pathname)
 
   const containerClass = [
     styles.container,

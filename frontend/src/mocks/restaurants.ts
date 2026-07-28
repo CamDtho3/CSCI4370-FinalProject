@@ -243,9 +243,12 @@ export const mockRestaurants: RestaurantResponse[] = [
    unavailable and near-capacity states are reachable in the UI.
    ------------------------------------------------------------------- */
 
+/* Stored 24-hour, displayed 12-hour. Lunch and dinner service, so the
+   AM/PM distinction is real rather than decorative. */
 const SERVICE_TIMES = [
-  '17:00', '17:30', '18:00', '18:30', '19:00',
-  '19:30', '20:00', '20:30', '21:00',
+  '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00',
+  '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00',
+  '20:30', '21:00',
 ]
 
 /** Deterministic pseudo-random so a given restaurant and date always

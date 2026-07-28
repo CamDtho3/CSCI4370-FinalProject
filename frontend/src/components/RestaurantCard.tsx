@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { RestaurantWithSlots } from '../api/types'
+import { formatTime } from '../lib/time'
 import styles from './RestaurantCard.module.css'
 
 interface Props {
@@ -114,7 +115,7 @@ export default function RestaurantCard({
                     : styles.slot
                 }
               >
-                {slotTime}
+                {formatTime(slotTime)}
               </button>
             )
           })}
