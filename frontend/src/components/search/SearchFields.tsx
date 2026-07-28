@@ -1,6 +1,7 @@
 import { useId } from 'react'
 import type { FormEvent } from 'react'
 import { useSearch } from '../../context/SearchContext'
+import RestaurantTypeahead from './RestaurantTypeahead'
 import styles from './SearchFields.module.css'
 
 interface Props {
@@ -30,15 +31,13 @@ export default function SearchFields({ hero = false, onSubmit }: Props) {
     >
       <div className={`${styles.field} ${styles.term}`}>
         <label className={styles.label} htmlFor={`${id}-term`}>
-          Where or what
+          Restaurant or cuisine
         </label>
-        <input
-          id={`${id}-term`}
-          className={styles.input}
-          type="search"
-          placeholder="Athens, or Italian"
+        <RestaurantTypeahead
+          inputId={`${id}-term`}
+          hero={hero}
           value={query.term}
-          onChange={(e) => setQuery({ term: e.target.value })}
+          onChange={(term) => setQuery({ term })}
         />
       </div>
 

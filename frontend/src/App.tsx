@@ -6,6 +6,7 @@ import RequireAuth from './components/RequireAuth'
 import Home from './pages/Home'
 import RestaurantDetail from './pages/RestaurantDetail'
 import Login from './pages/Login'
+import BookingConfirm from './pages/BookingConfirm'
 
 // Placeholders — replace as each page gets built.
 const Stub = ({ name }: { name: string }) => <h1>{name}</h1>
@@ -27,7 +28,7 @@ export default function App() {
                 path="restaurants/:restPhone/book"
                 element={
                   <RequireAuth>
-                    <Stub name="Confirm booking" />
+                    <BookingConfirm />
                   </RequireAuth>
                 }
               />

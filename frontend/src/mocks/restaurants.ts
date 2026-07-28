@@ -3,6 +3,7 @@ import type {
   TimeSlotResponse,
   RestaurantWithSlots,
 } from '../api/types'
+import { searchRestaurants } from '../lib/search'
 
 /* ===================================================================
    Mock restaurant data — real Athens, GA establishments.
@@ -290,14 +291,11 @@ export function findMockRestaurant(
   return mockRestaurants.find((r) => r.restPhone === restPhone)
 }
 
-/** Matches the free-text search box against name, cuisine, or city. */
+/** Matches the free-text search box. Shares the typeahead's matching
+ *  rules — see lib/search.ts for why city matches on prefix only. */
 export function searchMockRestaurants(term: string): RestaurantResponse[] {
-  const q = term.trim().toLowerCase()
-  if (!q) return mockRestaurants
-  return mockRestaurants.filter(
-    (r) =>
-      r.restName.toLowerCase().includes(q) ||
-      r.cuisine.toLowerCase().includes(q) ||
-      r.city.toLowerCase().includes(q),
+  if (!term.trim()) return mockRestaurants
+  return searchRestaurants(mockRestaurants, term, mockRestaurants.length).map(
+    (m) => m.restaurant,
   )
 }

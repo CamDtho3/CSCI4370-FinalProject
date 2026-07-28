@@ -1,0 +1,95 @@
+.wrapper {
+  position: relative;
+}
+
+.input {
+  height: var(--control-height);
+  padding: 0 var(--space-3);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  font-size: var(--text-base);
+  color: var(--c-text);
+  width: 100%;
+  transition: border-color var(--duration-fast) var(--ease),
+              box-shadow var(--duration-fast) var(--ease);
+}
+
+.input::placeholder {
+  color: var(--c-text-muted);
+}
+
+.input:hover {
+  border-color: var(--c-border-strong);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--c-accent);
+  box-shadow: var(--focus-ring);
+}
+
+.hero .input {
+  height: 3rem;
+  font-size: var(--text-md);
+}
+
+/* --- Dropdown ----------------------------------------------------- */
+
+.listbox {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  right: 0;
+  z-index: 60;
+  max-height: 20rem;
+  overflow-y: auto;
+  padding: var(--space-1);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  list-style: none;
+  margin: 0;
+}
+
+.option {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.optionActive {
+  background: var(--c-accent-subtle);
+}
+
+.name {
+  font-size: var(--text-base);
+  line-height: var(--leading-snug);
+}
+
+.detail {
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+}
+
+/* Matched characters read at full strength; everything else recedes. */
+.hit {
+  background: none;
+  color: var(--c-text);
+  font-weight: var(--weight-medium);
+}
+
+.dim {
+  color: var(--c-text-muted);
+}
+
+.empty {
+  padding: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--c-text-muted);
+  text-align: center;
+}
