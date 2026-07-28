@@ -11,6 +11,7 @@ const DEMO_DINER: CurrentUser = {
   email: 'ana@example.com',
   fname: 'Ana',
   lname: 'Reyes',
+  userPhone: '706-555-0142',
   userRole: 'DINER',
 }
 
@@ -18,6 +19,7 @@ const DEMO_STAFF: CurrentUser = {
   email: 'host@thenational.com',
   fname: 'Cam',
   lname: 'Dunn',
+  userPhone: '706-549-3450',
   userRole: 'STAFF',
   employerName: 'The National',
 }

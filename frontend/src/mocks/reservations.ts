@@ -110,8 +110,56 @@ export function findMockReservation(
   return reservations.find((r) => r.resNum === resNum)
 }
 
+/**
+ * Server-side this filters by the authenticated principal — a diner
+ * must never receive another diner's bookings. The mock has one user
+ * at a time, so it returns everything.
+ */
 export function listMockReservations(): ReservationResponse[] {
   return [...reservations].sort((a, b) =>
     `${b.slotDate}${b.slotTime}`.localeCompare(`${a.slotDate}${a.slotTime}`),
   )
+}
+
+/**
+ * Cancels a booking.
+ *
+ * Server-side this is a status transition, not a delete: the row stays
+ * and a ReservationStatusHistory entry records who cancelled it and
+ * when. That trail is what settles "I cancelled in time" disputes.
+ */
+export async function cancelMockReservation(
+  resNum: string,
+): Promise<ReservationResponse> {
+  await new Promise((r) => setTimeout(r, 300))
+
+  const found = reservations.find((r) => r.resNum === resNum)
+  if (!found) {
+    throw new MockApiError(404, 'NOT_FOUND', 'That reservation no longer exists.')
+  }
+  if (found.resStatus === 'CANCELLED') {
+    throw new MockApiError(409, 'ALREADY_CANCELLED', 'This booking is already cancelled.')
+  }
+  if (found.resStatus === 'COMPLETED' || found.resStatus === 'SEATED') {
+    throw new MockApiError(409, 'NOT_CANCELLABLE', 'This booking can no longer be cancelled.')
+  }
+
+  found.resStatus = 'CANCELLED'
+  return found
+}
+
+/** True while the booking is still in the future and not yet resolved. */
+export function isUpcoming(r: ReservationResponse): boolean {
+  if (r.resStatus === 'CANCELLED' || r.resStatus === 'COMPLETED' || r.resStatus === 'NO_SHOW') {
+    return false
+  }
+  return new Date(`${r.slotDate}T${r.slotTime}`) >= new Date()
+}
+
+/** Cancellation closes 2 hours before the reservation — see the policy
+ *  shown on the confirmation page. */
+export function isCancellable(r: ReservationResponse): boolean {
+  if (r.resStatus !== 'CONFIRMED' && r.resStatus !== 'PENDING') return false
+  const start = new Date(`${r.slotDate}T${r.slotTime}`).getTime()
+  return start - Date.now() > 2 * 60 * 60 * 1000
 }

@@ -7,6 +7,12 @@ import Home from './pages/Home'
 import RestaurantDetail from './pages/RestaurantDetail'
 import Login from './pages/Login'
 import BookingConfirm from './pages/BookingConfirm'
+import MyReservations from './pages/MyReservations'
+import ReservationDetail from './pages/ReservationDetail'
+import Signup from './pages/Signup'
+import StaffToday from './pages/StaffToday'
+import StaffAvailability from './pages/StaffAvailability'
+import NotFound from './pages/NotFound'
 
 // Placeholders — replace as each page gets built.
 const Stub = ({ name }: { name: string }) => <h1>{name}</h1>
@@ -37,7 +43,7 @@ export default function App() {
                 path="reservations"
                 element={
                   <RequireAuth>
-                    <Stub name="My reservations" />
+                    <MyReservations />
                   </RequireAuth>
                 }
               />
@@ -45,19 +51,19 @@ export default function App() {
                 path="reservations/:resNum"
                 element={
                   <RequireAuth>
-                    <Stub name="Reservation" />
+                    <ReservationDetail />
                   </RequireAuth>
                 }
               />
 
               <Route path="login" element={<Login />} />
-              <Route path="signup" element={<Stub name="Sign up" />} />
+              <Route path="signup" element={<Signup />} />
 
               <Route
                 path="staff"
                 element={
                   <RequireAuth>
-                    <Stub name="Today" />
+                    <StaffToday />
                   </RequireAuth>
                 }
               />
@@ -65,12 +71,12 @@ export default function App() {
                 path="staff/availability"
                 element={
                   <RequireAuth>
-                    <Stub name="Availability" />
+                    <StaffAvailability />
                   </RequireAuth>
                 }
               />
 
-              <Route path="*" element={<Stub name="Not found" />} />
+              <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
         </SearchProvider>

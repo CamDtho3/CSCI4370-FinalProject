@@ -1,0 +1,100 @@
+import { Link, useNavigate } from 'react-router-dom'
+import type { ReservationResponse } from '../api/types'
+import { Button, ReservationBadge } from '../components/ui'
+import { listMockReservations, isUpcoming } from '../mocks/reservations'
+import { formatTime } from '../lib/time'
+import styles from './MyReservations.module.css'
+
+function ReservationRow({
+  r,
+  past = false,
+}: {
+  r: ReservationResponse
+  past?: boolean
+}) {
+  const date = new Date(`${r.slotDate}T00:00:00`)
+
+  return (
+    <Link
+      to={`/reservations/${r.resNum}`}
+      className={past ? `${styles.row} ${styles.past}` : styles.row}
+    >
+      <div className={styles.when}>
+        <div className={styles.month}>
+          {date.toLocaleDateString('en-US', { month: 'short' })}
+        </div>
+        <div className={styles.day}>{date.getDate()}</div>
+      </div>
+
+      <div className={styles.divider} />
+
+      <div className={styles.body}>
+        <div className={styles.restName}>{r.restName}</div>
+        <div className={styles.detail}>
+          {formatTime(r.slotTime)} · {r.partySize}{' '}
+          {r.partySize === 1 ? 'guest' : 'guests'}
+        </div>
+      </div>
+
+      <div className={styles.trailing}>
+        <span className={styles.resNum}>{r.resNum}</span>
+        <ReservationBadge status={r.resStatus} />
+      </div>
+    </Link>
+  )
+}
+
+export default function MyReservations() {
+  const navigate = useNavigate()
+
+  // Swap for a fetch once GET /api/reservations exists. The endpoint
+  // scopes to the authenticated diner; the mock has one user.
+  const all = listMockReservations()
+  const upcoming = all.filter(isUpcoming)
+  const past = all.filter((r) => !isUpcoming(r))
+
+  if (all.length === 0) {
+    return (
+      <>
+        <h1 className={styles.title}>Your reservations</h1>
+        <div className={styles.empty}>
+          <p className={styles.emptyTitle}>No reservations yet</p>
+          <p className={styles.emptyBody}>
+            Once you book a table it will show up here.
+          </p>
+          <Button variant="primary" onClick={() => navigate('/')}>
+            Find a restaurant
+          </Button>
+        </div>
+      </>
+    )
+  }
+
+  return (
+    <>
+      <h1 className={styles.title}>Your reservations</h1>
+
+      {upcoming.length > 0 && (
+        <section className={styles.group}>
+          <h2 className={styles.groupTitle}>Upcoming</h2>
+          <div className={styles.list}>
+            {upcoming.map((r) => (
+              <ReservationRow key={r.resNum} r={r} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {past.length > 0 && (
+        <section className={styles.group}>
+          <h2 className={styles.groupTitle}>Past and cancelled</h2>
+          <div className={styles.list}>
+            {past.map((r) => (
+              <ReservationRow key={r.resNum} r={r} past />
+            ))}
+          </div>
+        </section>
+      )}
+    </>
+  )
+}

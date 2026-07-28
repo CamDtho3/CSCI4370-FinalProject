@@ -1,16 +1,11 @@
 import { createContext, useContext, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
+import type { CurrentUser } from '../api/types'
 
-export type UserRole = 'DINER' | 'STAFF' | 'REST_ADMIN' | 'PLATFORM_ADMIN'
-
-export interface CurrentUser {
-  email: string
-  fname: string
-  lname: string
-  userRole: UserRole
-  /** Present only for STAFF and REST_ADMIN — FD A7, employer_phone. */
-  employerName?: string
-}
+/* The CurrentUser shape lives in api/types.ts with the rest of the
+   API contract — it is what the auth endpoints return, so it belongs
+   beside them rather than here. Re-exported for convenience. */
+export type { CurrentUser, UserRole } from '../api/types'
 
 interface AuthContextValue {
   user: CurrentUser | null

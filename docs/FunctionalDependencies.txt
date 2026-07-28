@@ -1,0 +1,18 @@
+Functional Dependencies:
+
+1. rest_phone -> rest_name, street, zip, city, state, cuisine, price_range, image_url, rest_created
+
+2. rest_phone, slot_date, slot_time -> slot_capacity
+
+3. rest_phone, day_of_week -> open_time, close_time, is_closed
+
+4. email -> pwd_hash, user_role, fname, lname, user_phone, acct_created, employer_phone
+   (employer_phone is the restaurant this account works for. Null for
+    diners and platform admins. Shown in the UML as the "employs"
+    association rather than as an attribute.)
+
+5. res_num -> party_size, special_req, res_status, res_created, slot_date, slot_time, rest_phone, email
+
+6. email, rest_phone -> rating, comment, review_created
+
+7. res_num, changed_at -> changed_to, changed_by
