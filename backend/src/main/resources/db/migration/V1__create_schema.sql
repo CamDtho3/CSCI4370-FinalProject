@@ -1,4 +1,4 @@
-CREATE TABLE Restaurant (
+CREATE TABLE restaurant (
     rest_phone      VARCHAR(20) PRIMARY KEY,
     rest_name       VARCHAR(100) NOT NULL,
     street          VARCHAR(150),
@@ -11,19 +11,7 @@ CREATE TABLE Restaurant (
     rest_created    TIMESTAMP NOT NULL
 );
 
-CREATE TABLE ReservationSlot (
-    rest_phone      VARCHAR(20),
-    slot_date       DATE,
-    slot_time       TIME,
-    slot_capacity   INTEGER NOT NULL,
-
-    PRIMARY KEY (rest_phone, slot_date, slot_time),
-
-    FOREIGN KEY (rest_phone)
-        REFERENCES Restaurant(rest_phone)
-);
-
-CREATE TABLE RestaurantHours (
+CREATE TABLE restaurant_hours (
     rest_phone      VARCHAR(20),
     day_of_week     VARCHAR(10),
     open_time       TIME,
@@ -33,10 +21,22 @@ CREATE TABLE RestaurantHours (
     PRIMARY KEY (rest_phone, day_of_week),
 
     FOREIGN KEY (rest_phone)
-        REFERENCES Restaurant(rest_phone)
+        REFERENCES restaurant(rest_phone)
 );
 
-CREATE TABLE UserAccount (
+CREATE TABLE reservation_slot (
+    rest_phone      VARCHAR(20),
+    slot_date       DATE,
+    slot_time       TIME,
+    slot_capacity   INTEGER NOT NULL,
+
+    PRIMARY KEY (rest_phone, slot_date, slot_time),
+
+    FOREIGN KEY (rest_phone)
+        REFERENCES restaurant(rest_phone)
+);
+
+CREATE TABLE user_account (
     email           VARCHAR(255) PRIMARY KEY,
     pwd_hash        VARCHAR(255) NOT NULL,
     user_role       VARCHAR(20) NOT NULL,
@@ -47,10 +47,10 @@ CREATE TABLE UserAccount (
     employer_phone  VARCHAR(20),
 
     FOREIGN KEY (employer_phone)
-        REFERENCES Restaurant(rest_phone)
+        REFERENCES restaurant(rest_phone)
 );
 
-CREATE TABLE Reservation (
+CREATE TABLE reservation (
     res_num         SERIAL PRIMARY KEY,
     party_size      INTEGER NOT NULL,
     special_req     TEXT,
@@ -62,16 +62,16 @@ CREATE TABLE Reservation (
     email           VARCHAR(255),
 
     FOREIGN KEY (rest_phone)
-        REFERENCES Restaurant(rest_phone),
+        REFERENCES restaurant(rest_phone),
 
     FOREIGN KEY (email)
-        REFERENCES UserAccount(email),
+        REFERENCES user_account(email),
 
     FOREIGN KEY (rest_phone, slot_date, slot_time)
-        REFERENCES ReservationSlot(rest_phone, slot_date, slot_time)
+        REFERENCES reservation_slot(rest_phone, slot_date, slot_time)
 );
 
-CREATE TABLE Review (
+CREATE TABLE review (
     email           VARCHAR(255),
     rest_phone      VARCHAR(20),
     rating          INTEGER,
@@ -81,13 +81,13 @@ CREATE TABLE Review (
     PRIMARY KEY (email, rest_phone),
 
     FOREIGN KEY (email)
-        REFERENCES UserAccount(email),
+        REFERENCES user_account(email),
 
     FOREIGN KEY (rest_phone)
-        REFERENCES Restaurant(rest_phone)
+        REFERENCES restaurant(rest_phone)
 );
 
-CREATE TABLE ReservationHistory (
+CREATE TABLE reservation_history (
     res_num         INTEGER,
     changed_at      TIMESTAMP,
     changed_to      VARCHAR(20),
@@ -96,8 +96,8 @@ CREATE TABLE ReservationHistory (
     PRIMARY KEY (res_num, changed_at),
 
     FOREIGN KEY (res_num)
-        REFERENCES Reservation(res_num),
+        REFERENCES reservation(res_num),
 
     FOREIGN KEY (changed_by)
-        REFERENCES UserAccount(email)
+        REFERENCES user_account(email)
 );
