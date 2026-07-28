@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: backend
+
+  # Drop an application-local.yml next to this file (gitignored) to
+  # override anything below without touching tracked config.
+  config:
+    import: optional:application-local.yml
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/reservex}
+    username: ${SPRING_DATASOURCE_USERNAME:reservex}
+    password: ${SPRING_DATASOURCE_PASSWORD:reservex}
+
+  jpa:
+    # Flyway owns the schema — Hibernate only checks entities match it,
+    # never generates or alters DDL.
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    locations: classpath:db/migration
+
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    # Matches the Vite dev proxy's /api prefix (vite.config.ts) so the
+    # browser always sees one origin and CORS never comes into play.
+    context-path: /api
+
+logging:
+  level:
+    org.hibernate.SQL: debug
