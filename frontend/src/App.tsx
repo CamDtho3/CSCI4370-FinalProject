@@ -25,7 +25,6 @@ export default function App() {
           <Routes>
             <Route element={<Layout />}>
               <Route index element={<Home />} />
-              <Route path="search" element={<Stub name="Search results" />} />
               <Route path="restaurants/:restPhone" element={<RestaurantDetail />} />
 
               {/* Booking carries its state in the URL so it survives

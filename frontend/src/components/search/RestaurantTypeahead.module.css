@@ -34,8 +34,6 @@
   font-size: var(--text-md);
 }
 
-/* --- Dropdown ----------------------------------------------------- */
-
 .listbox {
   position: absolute;
   top: calc(100% + var(--space-1));
@@ -76,7 +74,6 @@
   line-height: var(--leading-snug);
 }
 
-/* Matched characters read at full strength; everything else recedes. */
 .hit {
   background: none;
   color: var(--c-text);

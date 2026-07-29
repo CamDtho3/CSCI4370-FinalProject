@@ -1,6 +1,3 @@
-/* The Layout gives the home route a flush, full-width container, so
-   this page manages its own horizontal rhythm. */
-
 .hero {
   background: var(--c-hero);
 }
@@ -28,8 +25,6 @@
   margin: 0 auto var(--space-8);
 }
 
-/* The search card floats on the colour field — that contrast is what
-   makes it read as the primary action on the page. */
 .searchWrap {
   max-width: 46rem;
   margin: 0 auto;

@@ -1,9 +1,3 @@
-/* ===================================================================
-   Base — reset and global element defaults
-   Loaded once, after tokens. Component styling goes in .module.css
-   files, not here.
-   =================================================================== */
-
 *,
 *::before,
 *::after {
@@ -37,11 +31,6 @@ body {
   flex-direction: column;
 }
 
-/* --- Headings ----------------------------------------------------
-   Sizes are set here so components don't each invent their own.
-   Sentence case throughout — no Title Case, no ALL CAPS.
-   ----------------------------------------------------------------- */
-
 h1, h2, h3, h4 {
   font-weight: var(--weight-medium);
   line-height: var(--leading-tight);
@@ -58,16 +47,10 @@ p {
   text-wrap: pretty;
 }
 
-/* --- Media -------------------------------------------------------- */
-
 img, picture, video, canvas, svg {
   display: block;
   max-width: 100%;
 }
-
-/* --- Forms -------------------------------------------------------
-   Inherit type rather than falling back to the browser default.
-   ----------------------------------------------------------------- */
 
 input, button, textarea, select {
   font: inherit;
@@ -86,8 +69,6 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* --- Links -------------------------------------------------------- */
-
 a {
   color: var(--c-accent);
   text-decoration-thickness: 1px;
@@ -98,11 +79,6 @@ a:hover {
   color: var(--c-accent-hover);
 }
 
-/* --- Focus -------------------------------------------------------
-   Visible for keyboard users, absent for mouse users. Never remove
-   this without replacing it.
-   ----------------------------------------------------------------- */
-
 :focus-visible {
   outline: 2px solid var(--c-accent);
   outline-offset: 2px;
@@ -112,8 +88,6 @@ a:hover {
 :focus:not(:focus-visible) {
   outline: none;
 }
-
-/* --- Utility ------------------------------------------------------ */
 
 .srOnly {
   position: absolute;

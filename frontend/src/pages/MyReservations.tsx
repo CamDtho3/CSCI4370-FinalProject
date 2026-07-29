@@ -1,10 +1,19 @@
 import { Link, useNavigate } from 'react-router-dom'
 import type { ReservationResponse } from '../api/types'
 import { Button, ReservationBadge } from '../components/ui'
-import { listMockReservations, isUpcoming } from '../mocks/reservations'
+import {
+  listMockReservations,
+  isUpcoming,
+  isCancellable,
+} from '../mocks/reservations'
 import { formatTime } from '../lib/time'
 import styles from './MyReservations.module.css'
 
+/**
+ * The row is a <div>, not a <Link>. A button nested inside an anchor is
+ * invalid HTML and breaks keyboard navigation, so the link covers the
+ * restaurant name and the Edit button sits beside it as a sibling.
+ */
 function ReservationRow({
   r,
   past = false,
@@ -13,12 +22,10 @@ function ReservationRow({
   past?: boolean
 }) {
   const date = new Date(`${r.slotDate}T00:00:00`)
+  const editable = isCancellable(r)
 
   return (
-    <Link
-      to={`/reservations/${r.resNum}`}
-      className={past ? `${styles.row} ${styles.past}` : styles.row}
-    >
+    <div className={past ? `${styles.row} ${styles.past}` : styles.row}>
       <div className={styles.when}>
         <div className={styles.month}>
           {date.toLocaleDateString('en-US', { month: 'short' })}
@@ -29,7 +36,9 @@ function ReservationRow({
       <div className={styles.divider} />
 
       <div className={styles.body}>
-        <div className={styles.restName}>{r.restName}</div>
+        <Link to={`/reservations/${r.resNum}`} className={styles.restName}>
+          {r.restName}
+        </Link>
         <div className={styles.detail}>
           {formatTime(r.slotTime)} · {r.partySize}{' '}
           {r.partySize === 1 ? 'guest' : 'guests'}
@@ -39,8 +48,16 @@ function ReservationRow({
       <div className={styles.trailing}>
         <span className={styles.resNum}>{r.resNum}</span>
         <ReservationBadge status={r.resStatus} />
+        {editable && (
+          <Link
+            to={`/reservations/${r.resNum}?edit=1`}
+            className={styles.editLink}
+          >
+            Edit
+          </Link>
+        )}
       </div>
-    </Link>
+    </div>
   )
 }
 

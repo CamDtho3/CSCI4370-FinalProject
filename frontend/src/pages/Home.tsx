@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useSearch } from '../context/SearchContext'
 import SearchFields from '../components/search/SearchFields'
 import CardSection from '../components/CardSection'
@@ -16,7 +15,6 @@ function formatDate(iso: string): string {
 
 export default function Home() {
   const { query } = useSearch()
-  const navigate = useNavigate()
 
   // Swap for a real fetch once /api/restaurants exists.
   const restaurants = useMemo(
@@ -27,9 +25,7 @@ export default function Home() {
   // Unrated restaurants sort last rather than as zero.
   const topRated = useMemo(
     () =>
-      [...restaurants].sort(
-        (a, b) => (b.avgRating ?? -1) - (a.avgRating ?? -1),
-      ),
+      [...restaurants].sort((a, b) => (b.avgRating ?? -1) - (a.avgRating ?? -1)),
     [restaurants],
   )
 
@@ -42,7 +38,7 @@ export default function Home() {
             Find a spot for tonight, this weekend, or whenever you're free.
           </p>
           <div className={styles.searchWrap}>
-            <SearchFields hero onSubmit={() => navigate('/search')} />
+            <SearchFields hero onSubmit={() => {}} />
           </div>
         </div>
       </section>

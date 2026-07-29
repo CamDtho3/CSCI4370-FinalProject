@@ -32,7 +32,6 @@
   background: var(--c-surface);
   border: 1px solid var(--c-border);
   border-radius: var(--radius-lg);
-  text-decoration: none;
   color: inherit;
   transition: border-color var(--duration-fast) var(--ease),
               box-shadow var(--duration-fast) var(--ease);
@@ -47,7 +46,6 @@
   background: transparent;
 }
 
-/* Date block on the left — the thing people scan for. */
 .when {
   flex-shrink: 0;
   width: 4.5rem;
@@ -80,12 +78,39 @@
 }
 
 .restName {
+  display: block;
   font-size: var(--text-base);
   font-weight: var(--weight-medium);
+  color: var(--c-text);
+  text-decoration: none;
   margin-bottom: 2px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.restName:hover {
+  color: var(--c-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.editLink {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--c-accent);
+  text-decoration: none;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--c-border-input);
+  border-radius: var(--radius);
+  white-space: nowrap;
+  transition: border-color var(--duration-fast) var(--ease),
+              background var(--duration-fast) var(--ease);
+}
+
+.editLink:hover {
+  border-color: var(--c-accent);
+  background: var(--c-accent-subtle);
 }
 
 .detail {
@@ -105,8 +130,6 @@
   font-size: var(--text-xs);
   color: var(--c-text-muted);
 }
-
-/* --- Empty -------------------------------------------------------- */
 
 .empty {
   padding: var(--space-16) var(--space-6);

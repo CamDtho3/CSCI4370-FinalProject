@@ -1,50 +1,23 @@
-/* ===================================================================
-   Design tokens — warm minimal, high contrast, light
-   ===================================================================
-   Every value in the UI comes from here. If you find yourself
-   writing a raw hex or a one-off pixel value in a component,
-   add a token instead.
-   =================================================================== */
-
 :root {
-  /* ---------------------------------------------------------------
-     Colour — surfaces
-     Warm neutrals. The page is cream; cards sit on top in white.
-     --------------------------------------------------------------- */
-  --c-bg:              #FAF8F5;  /* page canvas                     */
-  --c-surface:         #FFFFFF;  /* cards, panels, inputs           */
-  --c-surface-sunken:  #F2EFE9;  /* wells, disabled fields, table th */
-  --c-surface-hover:   #F5F2ED;  /* row / card hover                */
+  --c-bg:              #FAF8F5;
+  --c-surface:         #FFFFFF;
+  --c-surface-sunken:  #F2EFE9;
+  --c-surface-hover:   #F5F2ED;
 
-  /* ---------------------------------------------------------------
-     Colour — text
-     Near-black rather than grey. This is what makes it read as
-     high contrast instead of soft.
-     --------------------------------------------------------------- */
-  --c-text:            #1C1C1A;  /* body, headings      ~15:1 on bg */
-  --c-text-secondary:  #55524B;  /* supporting copy      ~8:1 on bg */
-  --c-text-muted:      #6F6B63;  /* metadata, captions ~4.8:1 on bg */
-  --c-text-inverse:    #FAF8F5;  /* on accent / dark fills          */
+  --c-text:            #1C1C1A;
+  --c-text-secondary:  #55524B;
+  --c-text-muted:      #6F6B63;
+  --c-text-inverse:    #FAF8F5;
 
-  /* ---------------------------------------------------------------
-     Colour — accent
-     Deep navy. Cooler than the cream base, so it reads as deliberate
-     contrast, and dark enough to carry white text at any size.
-     --------------------------------------------------------------- */
   --c-accent:          #1E3A5F;
   --c-accent-hover:    #17304F;
   --c-accent-active:   #11253D;
-  --c-accent-subtle:   #E9EFF6;  /* tinted backgrounds              */
+  --c-accent-subtle:   #E9EFF6;
   --c-accent-border:   #BFCFE2;
 
-  /* Hero band. Deep enough to carry cream text comfortably, and the
-     one place in the UI that gets a large field of colour. */
   --c-hero:            #16293F;
-  --c-hero-accent:     #9DB3CC;  /* muted text on the hero          */
+  --c-hero-accent:     #9DB3CC;
 
-  /* ---------------------------------------------------------------
-     Colour — status
-     --------------------------------------------------------------- */
   --c-danger:          #A8321F;
   --c-danger-subtle:   #FBEAE6;
   --c-danger-border:   #E8C0B6;
@@ -53,78 +26,55 @@
   --c-warning-subtle:  #FDF2DE;
   --c-warning-border:  #EBD5A8;
 
-  /* Success stays green — it carries semantic meaning independent of
-     the brand accent, and a navy "confirmed" badge would read as
-     neutral rather than positive. */
   --c-success:         #2D5A3D;
   --c-success-subtle:  #E8F0EA;
   --c-success-border:  #B9CFC1;
 
-  /* ---------------------------------------------------------------
-     Colour — borders
-     --------------------------------------------------------------- */
-  --c-border:          #E4DFD6;  /* default hairline                */
-  --c-border-strong:   #CFC8BB;  /* hover, emphasis                 */
-  --c-border-input:    #C9C2B5;  /* form controls need to read      */
+  --c-border:          #E4DFD6;
+  --c-border-strong:   #CFC8BB;
+  --c-border-input:    #C9C2B5;
 
-  /* ---------------------------------------------------------------
-     Typography
-     One family, two weights. Hierarchy comes from size and colour,
-     not from piling on weights.
-     --------------------------------------------------------------- */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
                Roboto, sans-serif;
   --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
 
-  --text-xs:    0.75rem;   /* 12px — badges, table labels           */
-  --text-sm:    0.8125rem; /* 13px — metadata, helper text          */
-  --text-base:  0.9375rem; /* 15px — body                           */
-  --text-md:    1rem;      /* 16px — emphasised body, inputs        */
-  --text-lg:    1.25rem;   /* 20px — card titles                    */
-  --text-xl:    1.5rem;    /* 24px — section headings               */
-  --text-2xl:   2rem;      /* 32px — page titles                    */
-  --text-3xl:   2.75rem;   /* 44px — hero                           */
+  --text-xs:    0.75rem;
+  --text-sm:    0.8125rem;
+  --text-base:  0.9375rem;
+  --text-md:    1rem;
+  --text-lg:    1.25rem;
+  --text-xl:    1.5rem;
+  --text-2xl:   2rem;
+  --text-3xl:   2.75rem;
 
   --weight-normal: 400;
   --weight-medium: 500;
 
-  --leading-tight: 1.2;    /* headings                              */
-  --leading-snug:  1.4;    /* card titles, buttons                  */
-  --leading-body:  1.6;    /* paragraphs                            */
+  --leading-tight: 1.2;
+  --leading-snug:  1.4;
+  --leading-body:  1.6;
 
-  --tracking-tight:  -0.02em;  /* large headings                    */
-  --tracking-normal: -0.005em; /* body — Inter benefits slightly    */
-  --tracking-wide:    0.04em;  /* uppercase labels only             */
+  --tracking-tight:  -0.02em;
+  --tracking-normal: -0.005em;
+  --tracking-wide:    0.04em;
 
-  /* ---------------------------------------------------------------
-     Spacing — 4px base
-     Use these everywhere. "padding: 13px" is how a project starts
-     looking homemade.
-     --------------------------------------------------------------- */
-  --space-1:  0.25rem;  /*  4px */
-  --space-2:  0.5rem;   /*  8px */
-  --space-3:  0.75rem;  /* 12px */
-  --space-4:  1rem;     /* 16px */
-  --space-5:  1.25rem;  /* 20px */
-  --space-6:  1.5rem;   /* 24px */
-  --space-8:  2rem;     /* 32px */
-  --space-10: 2.5rem;   /* 40px */
-  --space-12: 3rem;     /* 48px */
-  --space-16: 4rem;     /* 64px */
-  --space-20: 5rem;     /* 80px */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
 
-  /* ---------------------------------------------------------------
-     Radius
-     --------------------------------------------------------------- */
-  --radius-sm:   4px;   /* badges, tags                             */
-  --radius:      8px;   /* buttons, inputs, slot chips              */
-  --radius-lg:  12px;   /* cards, panels                            */
-  --radius-full: 999px; /* avatars, pills                           */
+  --radius-sm:   4px;
+  --radius:      8px;
+  --radius-lg:  12px;
+  --radius-full: 999px;
 
-  /* ---------------------------------------------------------------
-     Elevation
-     Kept very soft. On a warm background, heavy shadows read dirty.
-     --------------------------------------------------------------- */
   --shadow-sm: 0 1px 2px rgba(28, 28, 26, 0.05);
   --shadow:    0 1px 3px rgba(28, 28, 26, 0.07),
                0 1px 2px rgba(28, 28, 26, 0.04);
@@ -133,17 +83,11 @@
 
   --focus-ring: 0 0 0 3px rgba(30, 58, 95, 0.22);
 
-  /* ---------------------------------------------------------------
-     Layout
-     --------------------------------------------------------------- */
-  --control-height:    2.5rem;   /* 40px — buttons, inputs          */
-  --control-height-sm: 2rem;     /* 32px — compact controls         */
-  --container:        68rem;     /* 1088px — main content max width */
-  --container-narrow: 40rem;     /* 640px — forms, auth screens     */
+  --control-height:    2.5rem;
+  --control-height-sm: 2rem;
+  --container:        68rem;
+  --container-narrow: 40rem;
 
-  /* ---------------------------------------------------------------
-     Motion
-     --------------------------------------------------------------- */
   --duration-fast: 120ms;
   --duration:      180ms;
   --ease: cubic-bezier(0.4, 0, 0.2, 1);

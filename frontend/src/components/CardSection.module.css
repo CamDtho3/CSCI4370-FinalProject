@@ -8,7 +8,6 @@
   padding-bottom: var(--space-16);
 }
 
-/* The whole header row is the toggle, so the hit target is generous. */
 .head {
   display: flex;
   align-items: center;
