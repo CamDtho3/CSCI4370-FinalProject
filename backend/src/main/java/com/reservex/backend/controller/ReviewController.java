@@ -1,7 +1,7 @@
 package com.reservex.backend.controller;
 
+import com.reservex.backend.dto.ReviewRequest;
 import com.reservex.backend.dto.ReviewResponse;
-import com.reservex.backend.entity.Review;
 import com.reservex.backend.entity.ReviewId;
 import com.reservex.backend.service.ReviewService;
 
@@ -24,18 +24,16 @@ public class ReviewController {
     // GET all reviews
     @GetMapping
     public List<ReviewResponse> getAllReviews() {
-        return reviewService.getAllReviews().stream()
-                .map(ReviewResponse::from)
-                .toList();
+        return reviewService.getAllReviews();
     }
 
 
     // POST create review
     @PostMapping
     public ReviewResponse createReview(
-            @RequestBody Review review) {
+            @RequestBody ReviewRequest review) {
 
-        return ReviewResponse.from(reviewService.createReview(review));
+        return reviewService.createReview(review);
     }
 
 

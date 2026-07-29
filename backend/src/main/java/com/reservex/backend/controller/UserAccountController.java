@@ -1,8 +1,7 @@
 package com.reservex.backend.controller;
 
-import com.reservex.backend.common.exception.ApiException;
+import com.reservex.backend.dto.UserAccountRequest;
 import com.reservex.backend.dto.UserAccountResponse;
-import com.reservex.backend.entity.UserAccount;
 import com.reservex.backend.service.UserAccountService;
 
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +25,7 @@ public class UserAccountController {
     // GET all users
     @GetMapping
     public List<UserAccountResponse> getAllUsers() {
-        return userAccountService.getAllUsers().stream()
-                .map(UserAccountResponse::from)
-                .toList();
+        return userAccountService.getAllUsers();
     }
 
 
@@ -37,20 +34,16 @@ public class UserAccountController {
     public UserAccountResponse getUserByEmail(
             @PathVariable String email) {
 
-        UserAccount user = userAccountService.getUserByEmail(email);
-        if (user == null) {
-            throw ApiException.notFound("NOT_FOUND", "That account no longer exists.");
-        }
-        return UserAccountResponse.from(user);
+        return userAccountService.getUserResponse(email);
     }
 
 
     // CREATE user
     @PostMapping
     public UserAccountResponse createUser(
-            @RequestBody UserAccount user) {
+            @RequestBody UserAccountRequest user) {
 
-        return UserAccountResponse.from(userAccountService.createUser(user));
+        return userAccountService.createUser(user);
     }
 
 

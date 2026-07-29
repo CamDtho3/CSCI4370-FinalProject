@@ -1,7 +1,7 @@
 package com.reservex.backend.controller;
 
+import com.reservex.backend.dto.ReservationSlotRequest;
 import com.reservex.backend.dto.ReservationSlotResponse;
-import com.reservex.backend.entity.ReservationSlot;
 import com.reservex.backend.entity.ReservationSlotId;
 import com.reservex.backend.service.ReservationSlotService;
 
@@ -26,10 +26,7 @@ public class ReservationSlotController {
     // GET http://localhost:8080/api/reservation-slots
     @GetMapping
     public ResponseEntity<List<ReservationSlotResponse>> getAllSlots() {
-        return ResponseEntity.ok(
-                reservationSlotService.getAllSlots().stream()
-                        .map(ReservationSlotResponse::from)
-                        .toList());
+        return ResponseEntity.ok(reservationSlotService.getAllSlots());
     }
 
 
@@ -37,10 +34,10 @@ public class ReservationSlotController {
     // POST http://localhost:8080/api/reservation-slots
     @PostMapping
     public ResponseEntity<ReservationSlotResponse> createSlot(
-            @RequestBody ReservationSlot slot) {
+            @RequestBody ReservationSlotRequest slot) {
 
         return ResponseEntity.ok(
-                ReservationSlotResponse.from(reservationSlotService.createSlot(slot))
+                reservationSlotService.createSlot(slot)
         );
     }
 

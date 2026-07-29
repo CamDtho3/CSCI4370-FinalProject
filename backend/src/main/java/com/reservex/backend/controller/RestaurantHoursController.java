@@ -1,5 +1,6 @@
 package com.reservex.backend.controller;
 
+import com.reservex.backend.dto.RestaurantHoursRequest;
 import com.reservex.backend.dto.RestaurantHoursResponse;
 import com.reservex.backend.entity.RestaurantHours;
 import com.reservex.backend.service.RestaurantHoursService;
@@ -26,9 +27,7 @@ public class RestaurantHoursController {
     @GetMapping
     public List<RestaurantHoursResponse> getAllHours() {
 
-        return restaurantHoursService.getAllHours().stream()
-                .map(RestaurantHoursResponse::from)
-                .toList();
+        return restaurantHoursService.getAllHours();
 
     }
 
@@ -36,9 +35,9 @@ public class RestaurantHoursController {
     // CREATE restaurant hours
     @PostMapping
     public RestaurantHoursResponse createHours(
-            @RequestBody RestaurantHours hours) {
+            @RequestBody RestaurantHoursRequest hours) {
 
-        return RestaurantHoursResponse.from(restaurantHoursService.createHours(hours));
+        return restaurantHoursService.createHours(hours);
 
     }
 

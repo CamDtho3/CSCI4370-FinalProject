@@ -1,8 +1,7 @@
 package com.reservex.backend.controller;
 
-import com.reservex.backend.common.exception.ApiException;
+import com.reservex.backend.dto.RestaurantRequest;
 import com.reservex.backend.dto.RestaurantResponse;
-import com.reservex.backend.entity.Restaurant;
 import com.reservex.backend.service.RestaurantService;
 
 import org.springframework.web.bind.annotation.*;
@@ -23,12 +22,12 @@ public class RestaurantController {
     }
 
 
-    // GET all restaurants
+    // GET all restaurants, optionally filtered: /restaurants?search=term
     @GetMapping
-    public List<RestaurantResponse> getAllRestaurants() {
-        return restaurantService.getAllRestaurants().stream()
-                .map(RestaurantResponse::from)
-                .toList();
+    public List<RestaurantResponse> getAllRestaurants(
+            @RequestParam(required = false) String search) {
+
+        return restaurantService.getAllRestaurants(search);
     }
 
 
@@ -37,20 +36,16 @@ public class RestaurantController {
     public RestaurantResponse getRestaurantById(
             @PathVariable String restPhone) {
 
-        return restaurantService
-                .getRestaurantById(restPhone)
-                .map(RestaurantResponse::from)
-                .orElseThrow(() -> ApiException.notFound(
-                        "NOT_FOUND", "That restaurant no longer exists."));
+        return restaurantService.getRestaurantResponse(restPhone);
     }
 
 
     // CREATE restaurant
     @PostMapping
     public RestaurantResponse createRestaurant(
-            @RequestBody Restaurant restaurant) {
+            @RequestBody RestaurantRequest restaurant) {
 
-        return RestaurantResponse.from(restaurantService.createRestaurant(restaurant));
+        return restaurantService.createRestaurant(restaurant);
     }
 
 

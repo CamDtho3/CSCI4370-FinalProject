@@ -1,7 +1,7 @@
 package com.reservex.backend.controller;
 
+import com.reservex.backend.dto.ReservationHistoryRequest;
 import com.reservex.backend.dto.ReservationHistoryResponse;
-import com.reservex.backend.entity.ReservationHistory;
 import com.reservex.backend.entity.ReservationHistoryId;
 import com.reservex.backend.service.ReservationHistoryService;
 
@@ -24,18 +24,16 @@ public class ReservationHistoryController {
     // GET all reservation history
     @GetMapping
     public List<ReservationHistoryResponse> getAllHistory() {
-        return reservationHistoryService.getAllHistory().stream()
-                .map(ReservationHistoryResponse::from)
-                .toList();
+        return reservationHistoryService.getAllHistory();
     }
 
 
     // POST create reservation history record
     @PostMapping
     public ReservationHistoryResponse createHistory(
-            @RequestBody ReservationHistory history) {
+            @RequestBody ReservationHistoryRequest history) {
 
-        return ReservationHistoryResponse.from(reservationHistoryService.createHistory(history));
+        return reservationHistoryService.createHistory(history);
     }
 
 

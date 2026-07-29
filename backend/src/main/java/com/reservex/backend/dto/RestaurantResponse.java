@@ -13,9 +13,12 @@ public record RestaurantResponse(
     String cuisine,
     String priceRange,
     String imageUrl,
-    LocalDateTime restCreated) {
+    LocalDateTime restCreated,
+    Double avgRating,
+    long reviewCount) {
 
-  public static RestaurantResponse from(Restaurant r) {
+  /** avgRating is null, not 0, when the restaurant has no reviews yet. */
+  public static RestaurantResponse from(Restaurant r, Double avgRating, long reviewCount) {
     return new RestaurantResponse(
         r.getRestPhone(),
         r.getRestName(),
@@ -26,6 +29,8 @@ public record RestaurantResponse(
         r.getCuisine(),
         r.getPriceRange(),
         r.getImageUrl(),
-        r.getRestCreated());
+        r.getRestCreated(),
+        avgRating,
+        reviewCount);
   }
 }

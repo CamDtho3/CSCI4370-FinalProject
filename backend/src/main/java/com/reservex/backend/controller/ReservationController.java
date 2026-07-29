@@ -1,8 +1,8 @@
 package com.reservex.backend.controller;
 
-import com.reservex.backend.common.exception.ApiException;
+import com.reservex.backend.dto.ReservationRequest;
 import com.reservex.backend.dto.ReservationResponse;
-import com.reservex.backend.entity.Reservation;
+import com.reservex.backend.dto.ReservationStatusUpdateRequest;
 import com.reservex.backend.service.ReservationService;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,9 +23,7 @@ public class ReservationController {
     // GET all reservations
     @GetMapping
     public List<ReservationResponse> getAllReservations() {
-        return reservationService.getAllReservations().stream()
-                .map(ReservationResponse::from)
-                .toList();
+        return reservationService.getAllReservations();
     }
 
 
@@ -34,19 +32,26 @@ public class ReservationController {
     public ReservationResponse getReservationById(
             @PathVariable Integer id) {
 
-        return reservationService.getReservationById(id)
-                .map(ReservationResponse::from)
-                .orElseThrow(() -> ApiException.notFound(
-                        "NOT_FOUND", "That reservation no longer exists."));
+        return ReservationResponse.from(reservationService.getReservationEntity(id));
     }
 
 
-    // POST create reservation
+    // POST create reservation — capacity-checked, writes the first history row
     @PostMapping
     public ReservationResponse createReservation(
-            @RequestBody Reservation reservation) {
+            @RequestBody ReservationRequest reservation) {
 
-        return ReservationResponse.from(reservationService.createReservation(reservation));
+        return reservationService.createReservation(reservation);
+    }
+
+
+    // PATCH change status — validated against the allowed-transition map, writes a history row
+    @PatchMapping("/{id}/status")
+    public ReservationResponse updateStatus(
+            @PathVariable Integer id,
+            @RequestBody ReservationStatusUpdateRequest update) {
+
+        return reservationService.transitionStatus(id, update.toStatus(), update.changedByEmail());
     }
 
 
