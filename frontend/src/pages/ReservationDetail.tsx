@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import type { ReservationResponse } from '../api/types'
 import { Button, ReservationBadge } from '../components/ui'
@@ -12,7 +12,7 @@ import {
 } from '../mocks/reservations'
 import EditReservation from '../components/EditReservation'
 import type { ReservationEdit } from '../components/EditReservation'
-import { findMockRestaurant } from '../mocks/restaurants'
+import { findRestaurant } from '../mocks/restaurants'
 import { formatTime } from '../lib/time'
 import styles from './ReservationDetail.module.css'
 
@@ -57,6 +57,18 @@ export default function ReservationDetail() {
   const [reservation, setReservation] = useState<ReservationResponse | undefined>(
     () => findMockReservation(resNum),
   )
+  const [restaurant, setRestaurant] = useState<
+    | {
+        restPhone: string
+        restName: string
+        street: string
+        city: string
+        state: string
+        zip: string
+      }
+    | null
+  >(null)
+  const [loadingRestaurant, setLoadingRestaurant] = useState(true)
   const [confirming, setConfirming] = useState(false)
   const [cancelling, setCancelling] = useState(false)
   // ?edit=1 opens the panel straight away — set by the Edit link on the
@@ -73,6 +85,41 @@ export default function ReservationDetail() {
     }
   }
 
+  useEffect(() => {
+    if (!reservation) return
+
+    let active = true
+
+    setLoadingRestaurant(true)
+    findRestaurant(reservation.restPhone)
+      .then((result) => {
+        if (!active) return
+        setRestaurant(
+          result
+            ? {
+                restPhone: result.restPhone,
+                restName: result.restName,
+                street: result.street,
+                city: result.city,
+                state: result.state,
+                zip: result.zip,
+              }
+            : null,
+        )
+      })
+      .catch(() => {
+        if (!active) return
+        setRestaurant(null)
+      })
+      .finally(() => {
+        if (active) setLoadingRestaurant(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [reservation?.restPhone])
+
   if (!reservation) {
     return (
       <div className={styles.missing}>
@@ -86,8 +133,6 @@ export default function ReservationDetail() {
       </div>
     )
   }
-
-  const restaurant = findMockRestaurant(reservation.restPhone)
 
   async function handleCancel() {
     setCancelling(true)
@@ -137,12 +182,17 @@ export default function ReservationDetail() {
             <h1 className={styles.restName}>{reservation.restName}</h1>
             <ReservationBadge status={reservation.resStatus} />
           </div>
-          {restaurant && (
+          {loadingRestaurant ? (
+            <div className={styles.row}>
+              <span className={styles.rowLabel}>Restaurant</span>
+              <span className={styles.rowValue}>Loading...</span>
+            </div>
+          ) : restaurant ? (
             <p className={styles.address}>
               {restaurant.street}, {restaurant.city}, {restaurant.state}{' '}
               {restaurant.zip}
             </p>
-          )}
+          ) : null}
         </header>
 
         <div className={styles.rows}>

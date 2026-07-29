@@ -60,6 +60,13 @@ public class ReservationService {
                 .toList();
     }
 
+    public List<Reservation> getReservationsByRestaurantAndDate(
+            String restPhone,
+            LocalDate slotDate) {
+        return reservationRepository
+                .findByRestaurant_RestPhoneAndSlotDateOrderBySlotTimeAsc(restPhone, slotDate);
+    }
+
 
     public Reservation getReservationEntity(Integer resNum) {
         return reservationRepository.findById(resNum)

@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useSearch } from '../context/SearchContext'
 import SearchFields from '../components/search/SearchFields'
 import CardSection from '../components/CardSection'
-import { mockRestaurantsWithSlots } from '../mocks/restaurants'
+import { RestaurantsWithSlots } from '../api/restaurants'
 import styles from './Home.module.css'
 
 function formatDate(iso: string): string {
@@ -18,7 +18,7 @@ export default function Home() {
 
   // Swap for a real fetch once /api/restaurants exists.
   const restaurants = useMemo(
-    () => mockRestaurantsWithSlots(query.slotDate),
+    () => RestaurantsWithSlots(query.slotDate),
     [query.slotDate],
   )
 

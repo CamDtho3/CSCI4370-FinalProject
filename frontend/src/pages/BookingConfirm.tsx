@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useSearch } from '../context/SearchContext'
+import type { RestaurantResponse } from '../api/types'
 import { Button, Textarea } from '../components/ui'
-import { findMockRestaurant } from '../mocks/restaurants'
+import { findRestaurant } from '../mocks/restaurants'
 import { createMockReservation, MockApiError } from '../mocks/reservations'
 import { formatTime } from '../lib/time'
 import styles from './BookingConfirm.module.css'
@@ -26,18 +27,66 @@ export default function BookingConfirm() {
   const navigate = useNavigate()
 
   const slotTime = params.get('time') ?? ''
-  const restaurant = findMockRestaurant(restPhone)
+  const [restaurant, setRestaurant] = useState<RestaurantResponse | null>(null)
+  const [loadingRestaurant, setLoadingRestaurant] = useState(true)
 
   const [specialReq, setSpecialReq] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<{ title: string; body: string } | null>(null)
 
-  if (!restaurant || !slotTime) {
+  useEffect(() => {
+    let active = true
+
+    setLoadingRestaurant(true)
+    findRestaurant(restPhone)
+      .then((result) => {
+        if (!active) return
+        setRestaurant(result ?? null)
+      })
+      .catch(() => {
+        if (!active) return
+        setRestaurant(null)
+      })
+      .finally(() => {
+        if (active) setLoadingRestaurant(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [restPhone])
+
+  if (!slotTime) {
     return (
       <div className={styles.missing}>
         <h1>Booking details missing</h1>
         <p className={styles.missingText}>
           Pick a restaurant and a time to continue.
+        </p>
+        <Button variant="primary" onClick={() => navigate('/')}>
+          Back to search
+        </Button>
+      </div>
+    )
+  }
+
+  if (loadingRestaurant) {
+    return (
+      <div className={styles.missing}>
+        <h1>Loading booking details</h1>
+        <p className={styles.missingText}>
+          Fetching restaurant information.
+        </p>
+      </div>
+    )
+  }
+
+  if (!restaurant) {
+    return (
+      <div className={styles.missing}>
+        <h1>Booking details missing</h1>
+        <p className={styles.missingText}>
+          We couldn't find that restaurant.
         </p>
         <Button variant="primary" onClick={() => navigate('/')}>
           Back to search
