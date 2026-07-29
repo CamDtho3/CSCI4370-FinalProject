@@ -9,8 +9,6 @@
   margin-bottom: var(--space-6);
 }
 
-/* --- Summary ------------------------------------------------------ */
-
 .summary {
   background: var(--c-surface);
   border: 1px solid var(--c-border);
@@ -75,8 +73,6 @@
   text-align: right;
 }
 
-/* --- Form --------------------------------------------------------- */
-
 .form {
   margin-bottom: var(--space-6);
 }
@@ -112,8 +108,6 @@
   font-size: var(--text-sm);
   color: var(--c-danger);
 }
-
-/* --- Missing booking ---------------------------------------------- */
 
 .missing {
   padding: var(--space-16) 0;

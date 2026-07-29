@@ -29,7 +29,8 @@ export default function CompactSearch() {
 
   function runSearch() {
     setOpen(false)
-    navigate('/search')
+    // Home is the results page — it filters on the shared search state.
+    navigate('/')
   }
 
   return (

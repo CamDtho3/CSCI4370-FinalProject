@@ -45,7 +45,6 @@
   flex-shrink: 0;
 }
 
-/* Popover holding the full field set. Anchored under the trigger. */
 .popover {
   position: absolute;
   top: calc(100% + var(--space-2));

@@ -38,7 +38,7 @@ export default function Layout() {
 
       <footer className={styles.footer}>
         <div className={styles.footerInner}>
-          CSCI 4370 · Database Management · Fall 2026
+          CSCI 4370 · Database Management · Summer 2026
         </div>
       </footer>
     </>

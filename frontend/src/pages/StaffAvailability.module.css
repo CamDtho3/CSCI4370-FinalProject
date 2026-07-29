@@ -114,9 +114,6 @@
   overflow: hidden;
 }
 
-/* --fill is set per-row from JS. Passing a dynamic value through a
-   custom property is the one place inline style is correct — the
-   alternative is a class per percentage. */
 .barFill {
   display: block;
   height: 100%;

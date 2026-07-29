@@ -46,8 +46,6 @@
   box-shadow: var(--focus-ring);
 }
 
-/* --- Summary ------------------------------------------------------ */
-
 .stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
@@ -73,8 +71,6 @@
   font-weight: var(--weight-medium);
   line-height: var(--leading-tight);
 }
-
-/* --- Rows --------------------------------------------------------- */
 
 .list {
   display: flex;
@@ -176,7 +172,9 @@
   color: var(--c-text);
 }
 
-/* --- Audit trail -------------------------------------------------- */
+.editWrap {
+  margin-top: var(--space-4);
+}
 
 .history {
   margin-top: var(--space-4);

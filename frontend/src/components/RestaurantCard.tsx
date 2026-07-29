@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { RestaurantWithSlots } from '../api/types'
 import { formatTime } from '../lib/time'
@@ -46,7 +46,17 @@ export default function RestaurantCard({
     slots,
   } = restaurant
 
-  const visible = slots.slice(0, maxSlots)
+  /* Preview only bookable times, spread across the day.
+     Taking the first N gave four consecutive lunch slots on every
+     card — useless to someone browsing for dinner — and wasted one
+     of them on a struck-through full slot. */
+  const visible = useMemo(() => {
+    const open = slots.filter((s) => s.availableSpots > 0)
+    if (open.length <= maxSlots) return open
+    return Array.from({ length: maxSlots }, (_, i) =>
+      open[Math.round((i * (open.length - 1)) / (maxSlots - 1))],
+    )
+  }, [slots, maxSlots])
 
   return (
     <article>
@@ -97,28 +107,24 @@ export default function RestaurantCard({
         <p className={styles.noSlots}>No tables available</p>
       ) : (
         <div className={styles.slots}>
-          {visible.map(({ slotTime, availableSpots }) => {
-            const full = availableSpots === 0
-            return (
-              <button
-                key={slotTime}
-                type="button"
-                disabled={full}
-                aria-pressed={selected === slotTime}
-                onClick={() => {
-                  setSelected(slotTime)
-                  onSelectSlot?.(restPhone, slotTime)
-                }}
-                className={
-                  selected === slotTime
-                    ? `${styles.slot} ${styles.slotSelected}`
-                    : styles.slot
-                }
-              >
-                {formatTime(slotTime)}
-              </button>
-            )
-          })}
+          {visible.map(({ slotTime }) => (
+            <button
+              key={slotTime}
+              type="button"
+              aria-pressed={selected === slotTime}
+              onClick={() => {
+                setSelected(slotTime)
+                onSelectSlot?.(restPhone, slotTime)
+              }}
+              className={
+                selected === slotTime
+                  ? `${styles.slot} ${styles.slotSelected}`
+                  : styles.slot
+              }
+            >
+              {formatTime(slotTime)}
+            </button>
+          ))}
         </div>
       )}
     </article>

@@ -11,42 +11,36 @@
   white-space: nowrap;
 }
 
-/* Neutral — pending, waiting. Nothing has happened yet. */
 .neutral {
   background: var(--c-surface-sunken);
   border-color: var(--c-border);
   color: var(--c-text-secondary);
 }
 
-/* Positive — confirmed, notified. Forward progress. */
 .positive {
   background: var(--c-accent-subtle);
   border-color: var(--c-accent-border);
   color: var(--c-accent);
 }
 
-/* Active — seated. Happening right now, so it needs to stand out. */
 .active {
   background: var(--c-accent);
   border-color: var(--c-accent);
   color: var(--c-text-inverse);
 }
 
-/* Muted — completed, converted. Done and no longer actionable. */
 .muted {
   background: transparent;
   border-color: var(--c-border);
   color: var(--c-text-muted);
 }
 
-/* Warning — cancelled. Ended, but not the diner's fault. */
 .warning {
   background: var(--c-warning-subtle);
   border-color: var(--c-warning-border);
   color: var(--c-warning);
 }
 
-/* Danger — no_show. Deliberately distinct from cancelled. */
 .danger {
   background: var(--c-danger-subtle);
   border-color: var(--c-danger-border);

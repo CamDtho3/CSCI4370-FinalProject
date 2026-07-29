@@ -118,6 +118,11 @@
   flex-wrap: wrap;
 }
 
+.editWrap {
+  padding: var(--space-5) var(--space-6);
+  border-top: 1px solid var(--c-border);
+}
+
 .confirmCancel {
   font-size: var(--text-sm);
   color: var(--c-text-secondary);

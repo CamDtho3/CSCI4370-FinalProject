@@ -66,8 +66,6 @@
   color: var(--c-text-muted);
 }
 
-/* --- Booking panel ------------------------------------------------ */
-
 .panel {
   background: var(--c-surface);
   border: 1px solid var(--c-border);
@@ -89,8 +87,6 @@
   margin-bottom: var(--space-6);
 }
 
-/* Matches the label styling inside the shared Field components so the
-   native date input sits level with the Select beside it. */
 .field {
   display: flex;
   flex-direction: column;
@@ -132,9 +128,6 @@
   margin-bottom: var(--space-3);
 }
 
-/* Lunch and dinner get their own rows — that grouping is what makes
-   the AM/PM distinction scannable rather than something you read
-   off every button. */
 .periodGroup {
   margin-bottom: var(--space-5);
 }
