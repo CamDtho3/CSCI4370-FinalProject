@@ -1,9 +1,12 @@
 package com.reservex.backend.controller;
 
-import com.reservex.backend.dto.OperationHoursResponse;
-import com.reservex.backend.entity.RestaurantHours;
+import com.reservex.backend.dto.RestaurantHoursRequest;
+import com.reservex.backend.dto.RestaurantHoursResponse;
+import com.reservex.backend.entity.RestaurantHoursId;
 import com.reservex.backend.service.RestaurantHoursService;
 
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +29,7 @@ public class RestaurantHoursController {
 
     // GET all restaurant hours
     @GetMapping
-    public List<RestaurantHours> getAllHours() {
+    public List<RestaurantHoursResponse> getAllHours() {
 
         return restaurantHoursService.getAllHours();
 
@@ -47,22 +50,21 @@ public class RestaurantHoursController {
 
     // CREATE restaurant hours
     @PostMapping
-    public RestaurantHours createHours(
-            @RequestBody RestaurantHours hours) {
+    public RestaurantHoursResponse createHours(
+            @Valid @RequestBody RestaurantHoursRequest hours) {
 
         return restaurantHoursService.createHours(hours);
 
     }
 
 
-    // DELETE restaurant hours
+    // DELETE restaurant hours — takes just the composite key, not the full entity
     @DeleteMapping
-    public String deleteHours(
-            @RequestBody RestaurantHours hours) {
+    public ResponseEntity<Void> deleteHours(
+            @RequestBody RestaurantHoursId id) {
 
-        restaurantHoursService.deleteHours(hours);
-
-        return "Hours deleted";
+        restaurantHoursService.deleteHours(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

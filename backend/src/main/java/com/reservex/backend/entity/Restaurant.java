@@ -32,7 +32,7 @@ public class Restaurant {
     private String cuisine;
 
     @Column(name = "price_range")
-    private String priceRange;
+    private Integer priceRange;
 
     @Column(name = "image_url")
     private String imageUrl;

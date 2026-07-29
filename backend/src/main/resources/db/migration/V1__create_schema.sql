@@ -6,7 +6,7 @@ CREATE TABLE restaurant (
     city            VARCHAR(50),
     state           VARCHAR(30),
     cuisine         VARCHAR(50),
-    price_range     VARCHAR(20),
+    price_range     SMALLINT,
     image_url       TEXT,
     rest_created    TIMESTAMP NOT NULL
 );

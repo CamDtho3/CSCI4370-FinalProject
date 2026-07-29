@@ -1,7 +1,11 @@
 package com.reservex.backend.controller;
 
-import com.reservex.backend.entity.Reservation;
+import com.reservex.backend.dto.ReservationRequest;
+import com.reservex.backend.dto.ReservationResponse;
+import com.reservex.backend.dto.ReservationStatusUpdateRequest;
 import com.reservex.backend.service.ReservationService;
+
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +26,7 @@ public class ReservationController {
 
     // GET all reservations
     @GetMapping
-    public List<Reservation> getAllReservations() {
+    public List<ReservationResponse> getAllReservations() {
         return reservationService.getAllReservations();
     }
 
@@ -38,21 +42,29 @@ public class ReservationController {
 
     // GET reservation by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Reservation> getReservationById(
+    public ReservationResponse getReservationById(
             @PathVariable Integer id) {
 
-        return reservationService.getReservationById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ReservationResponse.from(reservationService.getReservationEntity(id));
     }
 
 
-    // POST create reservation
+    // POST create reservation — capacity-checked, writes the first history row
     @PostMapping
-    public Reservation createReservation(
-            @RequestBody Reservation reservation) {
+    public ReservationResponse createReservation(
+            @Valid @RequestBody ReservationRequest reservation) {
 
         return reservationService.createReservation(reservation);
+    }
+
+
+    // PATCH change status — validated against the allowed-transition map, writes a history row
+    @PatchMapping("/{id}/status")
+    public ReservationResponse updateStatus(
+            @PathVariable Integer id,
+            @Valid @RequestBody ReservationStatusUpdateRequest update) {
+
+        return reservationService.transitionStatus(id, update.toStatus(), update.changedByEmail());
     }
 
 

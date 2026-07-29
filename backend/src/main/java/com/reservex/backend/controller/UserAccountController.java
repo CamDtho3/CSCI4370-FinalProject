@@ -1,8 +1,11 @@
 package com.reservex.backend.controller;
 
-import com.reservex.backend.entity.UserAccount;
+import com.reservex.backend.dto.UserAccountRequest;
+import com.reservex.backend.dto.UserAccountResponse;
 import com.reservex.backend.service.UserAccountService;
 
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,7 +13,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
-@CrossOrigin
 public class UserAccountController {
 
 
@@ -24,24 +26,24 @@ public class UserAccountController {
 
     // GET all users
     @GetMapping
-    public List<UserAccount> getAllUsers() {
+    public List<UserAccountResponse> getAllUsers() {
         return userAccountService.getAllUsers();
     }
 
 
     // GET user by email
     @GetMapping("/{email}")
-    public UserAccount getUserByEmail(
+    public UserAccountResponse getUserByEmail(
             @PathVariable String email) {
 
-        return userAccountService.getUserByEmail(email);
+        return userAccountService.getUserResponse(email);
     }
 
 
     // CREATE user
     @PostMapping
-    public UserAccount createUser(
-            @RequestBody UserAccount user) {
+    public UserAccountResponse createUser(
+            @Valid @RequestBody UserAccountRequest user) {
 
         return userAccountService.createUser(user);
     }
@@ -49,9 +51,10 @@ public class UserAccountController {
 
     // DELETE user
     @DeleteMapping("/{email}")
-    public void deleteUser(
+    public ResponseEntity<Void> deleteUser(
             @PathVariable String email) {
 
         userAccountService.deleteUser(email);
+        return ResponseEntity.noContent().build();
     }
 }

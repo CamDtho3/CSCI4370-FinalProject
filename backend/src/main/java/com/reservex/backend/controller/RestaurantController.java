@@ -1,8 +1,11 @@
 package com.reservex.backend.controller;
 
-import com.reservex.backend.entity.Restaurant;
+import com.reservex.backend.dto.RestaurantRequest;
+import com.reservex.backend.dto.RestaurantResponse;
 import com.reservex.backend.service.RestaurantService;
 
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,7 +13,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/restaurants")
-@CrossOrigin
 public class RestaurantController {
 
 
@@ -22,28 +24,28 @@ public class RestaurantController {
     }
 
 
-    // GET all restaurants
+    // GET all restaurants, optionally filtered: /restaurants?search=term
     @GetMapping
-    public List<Restaurant> getAllRestaurants() {
-        return restaurantService.getAllRestaurants();
+    public List<RestaurantResponse> getAllRestaurants(
+            @RequestParam(required = false) String search) {
+
+        return restaurantService.getAllRestaurants(search);
     }
 
 
     // GET restaurant by phone
     @GetMapping("/{restPhone}")
-    public Restaurant getRestaurantById(
+    public RestaurantResponse getRestaurantById(
             @PathVariable String restPhone) {
 
-        return restaurantService
-                .getRestaurantById(restPhone)
-                .orElse(null);
+        return restaurantService.getRestaurantResponse(restPhone);
     }
 
 
     // CREATE restaurant
     @PostMapping
-    public Restaurant createRestaurant(
-            @RequestBody Restaurant restaurant) {
+    public RestaurantResponse createRestaurant(
+            @Valid @RequestBody RestaurantRequest restaurant) {
 
         return restaurantService.createRestaurant(restaurant);
     }
@@ -51,10 +53,11 @@ public class RestaurantController {
 
     // DELETE restaurant
     @DeleteMapping("/{restPhone}")
-    public void deleteRestaurant(
+    public ResponseEntity<Void> deleteRestaurant(
             @PathVariable String restPhone) {
 
         restaurantService.deleteRestaurant(restPhone);
+        return ResponseEntity.noContent().build();
     }
 
 }

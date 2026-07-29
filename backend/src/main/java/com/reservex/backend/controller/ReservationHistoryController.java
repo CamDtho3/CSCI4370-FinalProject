@@ -1,16 +1,18 @@
 package com.reservex.backend.controller;
 
-import com.reservex.backend.entity.ReservationHistory;
+import com.reservex.backend.dto.ReservationHistoryRequest;
+import com.reservex.backend.dto.ReservationHistoryResponse;
 import com.reservex.backend.entity.ReservationHistoryId;
 import com.reservex.backend.service.ReservationHistoryService;
 
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/reservation-history")
-@CrossOrigin(origins = "*")
 public class ReservationHistoryController {
 
     private final ReservationHistoryService reservationHistoryService;
@@ -23,15 +25,15 @@ public class ReservationHistoryController {
 
     // GET all reservation history
     @GetMapping
-    public List<ReservationHistory> getAllHistory() {
+    public List<ReservationHistoryResponse> getAllHistory() {
         return reservationHistoryService.getAllHistory();
     }
 
 
     // POST create reservation history record
     @PostMapping
-    public ReservationHistory createHistory(
-            @RequestBody ReservationHistory history) {
+    public ReservationHistoryResponse createHistory(
+            @Valid @RequestBody ReservationHistoryRequest history) {
 
         return reservationHistoryService.createHistory(history);
     }
@@ -39,9 +41,10 @@ public class ReservationHistoryController {
 
     // DELETE reservation history record
     @DeleteMapping
-    public void deleteHistory(
+    public ResponseEntity<Void> deleteHistory(
             @RequestBody ReservationHistoryId id) {
 
         reservationHistoryService.deleteHistory(id);
+        return ResponseEntity.noContent().build();
     }
 }

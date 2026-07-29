@@ -1,9 +1,11 @@
 package com.reservex.backend.controller;
 
-import com.reservex.backend.entity.ReservationSlot;
+import com.reservex.backend.dto.ReservationSlotRequest;
+import com.reservex.backend.dto.ReservationSlotResponse;
 import com.reservex.backend.entity.ReservationSlotId;
 import com.reservex.backend.service.ReservationSlotService;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,7 +13,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/reservation-slots")
-@CrossOrigin(origins = "*")
 public class ReservationSlotController {
 
     private final ReservationSlotService reservationSlotService;
@@ -25,7 +26,7 @@ public class ReservationSlotController {
     // GET all reservation slots
     // GET http://localhost:8080/api/reservation-slots
     @GetMapping
-    public ResponseEntity<List<ReservationSlot>> getAllSlots() {
+    public ResponseEntity<List<ReservationSlotResponse>> getAllSlots() {
         return ResponseEntity.ok(reservationSlotService.getAllSlots());
     }
 
@@ -33,8 +34,8 @@ public class ReservationSlotController {
     // CREATE reservation slot
     // POST http://localhost:8080/api/reservation-slots
     @PostMapping
-    public ResponseEntity<ReservationSlot> createSlot(
-            @RequestBody ReservationSlot slot) {
+    public ResponseEntity<ReservationSlotResponse> createSlot(
+            @Valid @RequestBody ReservationSlotRequest slot) {
 
         return ResponseEntity.ok(
                 reservationSlotService.createSlot(slot)

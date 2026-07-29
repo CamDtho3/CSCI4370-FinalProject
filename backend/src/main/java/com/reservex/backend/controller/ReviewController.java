@@ -1,16 +1,18 @@
 package com.reservex.backend.controller;
 
-import com.reservex.backend.entity.Review;
+import com.reservex.backend.dto.ReviewRequest;
+import com.reservex.backend.dto.ReviewResponse;
 import com.reservex.backend.entity.ReviewId;
 import com.reservex.backend.service.ReviewService;
 
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/reviews")
-@CrossOrigin(origins = "*")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -23,15 +25,15 @@ public class ReviewController {
 
     // GET all reviews
     @GetMapping
-    public List<Review> getAllReviews() {
+    public List<ReviewResponse> getAllReviews() {
         return reviewService.getAllReviews();
     }
 
 
     // POST create review
     @PostMapping
-    public Review createReview(
-            @RequestBody Review review) {
+    public ReviewResponse createReview(
+            @Valid @RequestBody ReviewRequest review) {
 
         return reviewService.createReview(review);
     }
@@ -39,9 +41,10 @@ public class ReviewController {
 
     // DELETE review using composite key
     @DeleteMapping
-    public void deleteReview(
+    public ResponseEntity<Void> deleteReview(
             @RequestBody ReviewId id) {
 
         reviewService.deleteReview(id);
+        return ResponseEntity.noContent().build();
     }
 }

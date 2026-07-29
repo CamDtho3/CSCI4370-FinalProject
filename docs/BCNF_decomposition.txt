@@ -1,0 +1,13 @@
+
+  Restaurant(rest_phone, rest_name, street, zip, city, state, cuisine,
+             price_range, image_url, rest_created)
+  ReservationSlot(rest_phone, slot_date, slot_time, slot_capacity)
+  RestaurantHours(rest_phone, day_of_week, open_time, close_time, is_closed)
+  UserAccount(email, pwd_hash, user_role, fname, lname, user_phone,
+              acct_created, employer_phone)
+  Review(email, rest_phone, rating, comment, review_created)
+  Reservation(res_num, party_size, special_req, res_status, res_created,
+              slot_date, slot_time, rest_phone, email)
+  ReservationHistory(res_num, changed_at, changed_to, changed_by)
+
+
