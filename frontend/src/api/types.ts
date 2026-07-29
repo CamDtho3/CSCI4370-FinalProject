@@ -111,6 +111,26 @@ export interface ReservationResponse {
   resCreated: string
 }
 
+export type Hour =
+    | '00' | '01' | '02' | '03' | '04' | '05'
+    | '06' | '07' | '08' | '09' | '10' | '11'
+    | '12' | '13' | '14' | '15' | '16' | '17'
+    | '18' | '19' | '20' | '21' | '22' | '23'
+
+export type Minute =
+    | '00' | '15' | '30' | '45'
+
+export type TimeSlot = `${Hour}:${Minute}`
+
+export interface OperationHoursResponse {
+  /** Natural key — FD group F. Shown to the diner as their confirmation. */
+  restPhone: string;
+  dayOfWeek: string;
+  openTime: TimeSlot;
+  closeTime: TimeSlot;
+  isClosed: boolean;
+}
+
 /**
  * What staff see. Deliberately a different shape from the diner-facing
  * response: it carries the guest's identity, which a diner has no

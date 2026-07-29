@@ -2,7 +2,12 @@ import type {
   RestaurantResponse,
   TimeSlotResponse,
   RestaurantWithSlots,
+  OperationHoursResponse,
 } from '../api/types'
+import {
+  getRestaurantByPhone,
+  getRestaurantHoursByPhone,
+} from '../api/restaurants'
 import { searchRestaurants } from '../lib/search'
 
 /* ===================================================================
@@ -246,11 +251,6 @@ export const mockRestaurants: RestaurantResponse[] = [
 
 /* Stored 24-hour, displayed 12-hour. Lunch and dinner service, so the
    AM/PM distinction is real rather than decorative. */
-const SERVICE_TIMES = [
-  '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00',
-  '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00',
-  '20:30', '21:00',
-]
 
 /** Deterministic pseudo-random so a given restaurant and date always
  *  render the same availability. Makes screenshots reproducible. */
@@ -262,6 +262,12 @@ function seeded(restPhone: string, slotDate: string, slotTime: string): number {
   }
   return Math.abs(h)
 }
+
+const SERVICE_TIMES = [
+  '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00',
+  '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00',
+  '20:30', '21:00',
+]
 
 export function mockSlotsFor(
   restPhone: string,
@@ -285,10 +291,17 @@ export function mockRestaurantsWithSlots(
   }))
 }
 
-export function findMockRestaurant(
+export async function findRestaurant(
   restPhone: string,
-): RestaurantResponse | undefined {
-  return mockRestaurants.find((r) => r.restPhone === restPhone)
+): Promise<RestaurantResponse | undefined> {
+  return getRestaurantByPhone(restPhone)
+}
+
+export async function findRestaurantHours(
+  restPhone: string,
+  dayOfWeek: string,
+): Promise<OperationHoursResponse | undefined> {
+  return getRestaurantHoursByPhone(restPhone, dayOfWeek)
 }
 
 /** Matches the free-text search box. Shares the typeahead's matching

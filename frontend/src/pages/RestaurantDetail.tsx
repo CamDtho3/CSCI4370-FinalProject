@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useSearch } from '../context/SearchContext'
+import type { RestaurantResponse } from '../api/types'
 import { Button, Select, partySizeOptions } from '../components/ui'
-import { findMockRestaurant, mockSlotsFor } from '../mocks/restaurants'
+import { findRestaurant, mockSlotsFor } from '../mocks/restaurants'
 import { formatTime, mealPeriodOf } from '../lib/time'
 import type { TimeSlotResponse } from '../api/types'
 import styles from './RestaurantDetail.module.css'
@@ -29,16 +30,46 @@ export default function RestaurantDetail() {
 
   const [imageFailed, setImageFailed] = useState(false)
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
+  const [restaurant, setRestaurant] = useState<RestaurantResponse | null>(null)
+  const [loadingRestaurant, setLoadingRestaurant] = useState(true)
 
-  const restaurant = useMemo(
-    () => findMockRestaurant(restPhone),
-    [restPhone],
-  )
+  useEffect(() => {
+    let active = true
+
+    setLoadingRestaurant(true)
+    findRestaurant(restPhone)
+      .then((result) => {
+        if (!active) return
+        setRestaurant(result ?? null)
+      })
+      .catch(() => {
+        if (!active) return
+        setRestaurant(null)
+      })
+      .finally(() => {
+        if (active) setLoadingRestaurant(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [restPhone])
 
   const slots = useMemo(
     () => mockSlotsFor(restPhone, query.slotDate),
     [restPhone, query.slotDate],
   )
+
+  if (loadingRestaurant) {
+    return (
+      <div className={styles.notFound}>
+        <h1>Loading restaurant</h1>
+        <p className={styles.notFoundText}>
+          Fetching restaurant details.
+        </p>
+      </div>
+    )
+  }
 
   if (!restaurant) {
     return (

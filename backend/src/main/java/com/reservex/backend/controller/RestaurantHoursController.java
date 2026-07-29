@@ -1,8 +1,10 @@
 package com.reservex.backend.controller;
 
+import com.reservex.backend.dto.OperationHoursResponse;
 import com.reservex.backend.entity.RestaurantHours;
 import com.reservex.backend.service.RestaurantHoursService;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +30,18 @@ public class RestaurantHoursController {
 
         return restaurantHoursService.getAllHours();
 
+    }
+
+    // GET restaurant hours for one restaurant on one day
+    @GetMapping("/{restPhone}")
+    public ResponseEntity<OperationHoursResponse> getHoursByRestaurantAndDay(
+            @PathVariable String restPhone,
+            @RequestParam String dayOfWeek) {
+
+        return restaurantHoursService
+                .getHoursResponseByRestaurantAndDay(restPhone, dayOfWeek)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 

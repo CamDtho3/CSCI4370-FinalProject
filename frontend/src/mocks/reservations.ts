@@ -1,5 +1,5 @@
 import type { ReservationResponse, ReservationRequest } from '../api/types'
-import { findMockRestaurant, mockSlotsFor } from './restaurants'
+import { findRestaurant, mockSlotsFor } from './restaurants'
 
 /* ===================================================================
    In-memory reservation store.
@@ -50,7 +50,7 @@ export async function createMockReservation(
   // Simulated latency so loading states are visible while building.
   await new Promise((r) => setTimeout(r, 400))
 
-  const restaurant = findMockRestaurant(req.restPhone)
+  const restaurant = await findRestaurant(req.restPhone)
   if (!restaurant) {
     throw new MockApiError(404, 'NOT_FOUND', 'That restaurant no longer exists.')
   }
