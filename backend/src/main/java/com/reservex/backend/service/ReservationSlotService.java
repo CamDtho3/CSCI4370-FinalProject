@@ -22,16 +22,19 @@ public class ReservationSlotService {
     private final ReservationSlotRepository reservationSlotRepository;
     private final ReservationRepository reservationRepository;
     private final RestaurantService restaurantService;
+    private final UserAccountService userAccountService;
 
 
     public ReservationSlotService(
             ReservationSlotRepository reservationSlotRepository,
             ReservationRepository reservationRepository,
-            RestaurantService restaurantService) {
+            RestaurantService restaurantService,
+            UserAccountService userAccountService) {
 
         this.reservationSlotRepository = reservationSlotRepository;
         this.reservationRepository = reservationRepository;
         this.restaurantService = restaurantService;
+        this.userAccountService = userAccountService;
     }
 
 
@@ -69,8 +72,10 @@ public class ReservationSlotService {
     }
 
 
-    // CREATE reservation slot
-    public ReservationSlotResponse createSlot(ReservationSlotRequest req) {
+    // CREATE reservation slot — staff at the target restaurant only
+    public ReservationSlotResponse createSlot(ReservationSlotRequest req, String actingEmail) {
+        userAccountService.requireStaffAt(actingEmail, req.restPhone());
+
         ReservationSlot slot = new ReservationSlot();
         slot.setRestaurant(restaurantService.getRestaurantEntity(req.restPhone()));
         slot.setSlotDate(req.slotDate());
@@ -81,10 +86,11 @@ public class ReservationSlotService {
     }
 
 
-    // DELETE reservation slot
-    public void deleteSlot(ReservationSlotId id) {
+    // DELETE reservation slot — staff at the restaurant only
+    public void deleteSlot(ReservationSlotId id, String actingEmail) {
 
-        getSlotEntity(id); // 404 if missing
+        ReservationSlot slot = getSlotEntity(id); // 404 if missing
+        userAccountService.requireStaffAt(actingEmail, slot.getRestaurant().getRestPhone());
         reservationSlotRepository.deleteById(id);
     }
 

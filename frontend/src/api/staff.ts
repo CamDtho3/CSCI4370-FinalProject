@@ -1,5 +1,5 @@
 import type { ReservationStatus, StaffReservationResponse } from './types'
-import { throwApiError } from './reservations'
+import { throwApiError } from './errors'
 
 /* ===================================================================
    Staff-side reservation client. Writes (status transitions, edits) go
@@ -50,6 +50,7 @@ export async function getStaffReservations(
 ): Promise<StaffReservationResponse[]> {
   const response = await fetch(
     `/api/reservations/restaurant/${encodeURIComponent(restPhone)}/staff?slotDate=${encodeURIComponent(slotDate)}`,
+    { credentials: 'same-origin' },
   )
 
   if (!response.ok) await throwApiError(response)

@@ -184,7 +184,7 @@ export default function StaffToday() {
   const stats = summarise(reservations)
 
   async function handleTransition(resNum: string, to: ReservationStatus) {
-    await transitionReservationStatus(resNum, to, user!.email)
+    await transitionReservationStatus(resNum, to)
     setVersion((v) => v + 1)
   }
 

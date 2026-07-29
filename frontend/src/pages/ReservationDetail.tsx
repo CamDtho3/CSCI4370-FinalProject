@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
 import type { ReservationResponse } from '../api/types'
 import { Button, ReservationBadge } from '../components/ui'
 import {
@@ -51,8 +50,6 @@ export default function ReservationDetail() {
   const { resNum = '' } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
-  const { user } = useAuth()
-
   // Set by BookingConfirm on success. Router state is right here —
   // it's a nicety, and losing it on refresh is correct behaviour.
   const justBooked = (location.state as { justBooked?: boolean } | null)
@@ -172,7 +169,7 @@ export default function ReservationDetail() {
     setCancelling(true)
     setError(null)
     try {
-      const updated = await cancelReservation(resNum, user!.email)
+      const updated = await cancelReservation(resNum)
       setReservation({ ...updated })
       setConfirming(false)
     } catch (err) {

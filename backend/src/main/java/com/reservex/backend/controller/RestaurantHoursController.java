@@ -1,11 +1,13 @@
 package com.reservex.backend.controller;
 
+import com.reservex.backend.common.auth.AuthSession;
 import com.reservex.backend.dto.OperationHoursResponse;
 import com.reservex.backend.dto.RestaurantHoursRequest;
 import com.reservex.backend.dto.RestaurantHoursResponse;
 import com.reservex.backend.entity.RestaurantHoursId;
 import com.reservex.backend.service.RestaurantHoursService;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,12 +49,13 @@ public class RestaurantHoursController {
     }
 
 
-    // CREATE restaurant hours
+    // CREATE restaurant hours — staff at the target restaurant only
     @PostMapping
     public RestaurantHoursResponse createHours(
-            @Valid @RequestBody RestaurantHoursRequest hours) {
+            @Valid @RequestBody RestaurantHoursRequest hours,
+            HttpSession session) {
 
-        return restaurantHoursService.createHours(hours);
+        return restaurantHoursService.createHours(hours, AuthSession.requireEmail(session));
 
     }
 
@@ -60,9 +63,10 @@ public class RestaurantHoursController {
     // DELETE restaurant hours — takes just the composite key, not the full entity
     @DeleteMapping
     public ResponseEntity<Void> deleteHours(
-            @RequestBody RestaurantHoursId id) {
+            @RequestBody RestaurantHoursId id,
+            HttpSession session) {
 
-        restaurantHoursService.deleteHours(id);
+        restaurantHoursService.deleteHours(id, AuthSession.requireEmail(session));
         return ResponseEntity.noContent().build();
     }
 

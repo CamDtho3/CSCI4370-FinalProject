@@ -6,8 +6,9 @@ import type {
   RestaurantWithSlots,
 } from './types'
 
-export async function getAllRestaurants(): Promise<RestaurantResponse[]> {
-  const response = await fetch('/api/restaurants')
+export async function getAllRestaurants(search?: string): Promise<RestaurantResponse[]> {
+  const query = search?.trim() ? `?search=${encodeURIComponent(search.trim())}` : ''
+  const response = await fetch(`/api/restaurants${query}`)
 
   if (!response.ok) {
     throw new Error('Failed to load restaurants')
@@ -64,8 +65,9 @@ export async function getReservationsByRestaurantAndDate(
 
 export async function getRestaurantsWithSlots(
   slotDate: string,
+  search?: string,
 ): Promise<RestaurantWithSlots[]> {
-  const restaurants = await getAllRestaurants()
+  const restaurants = await getAllRestaurants(search)
 
   return Promise.all(
     restaurants.map(async (r) => ({

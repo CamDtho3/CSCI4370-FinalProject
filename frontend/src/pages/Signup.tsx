@@ -1,9 +1,12 @@
-import { useId, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { signup } from '../api/auth'
+import { ApiError } from '../api/errors'
+import { getAllRestaurants } from '../api/restaurants'
+import type { RestaurantResponse } from '../api/types'
 import { Button, Input, Select } from '../components/ui'
-import { mockRestaurants } from '../mocks/restaurants'
 import styles from './Signup.module.css'
 
 type AccountType = 'diner' | 'restaurant'
@@ -26,6 +29,22 @@ export default function Signup() {
 
   const returnTo = params.get('returnTo') ?? '/'
 
+  const [restaurants, setRestaurants] = useState<RestaurantResponse[]>([])
+
+  useEffect(() => {
+    let active = true
+    getAllRestaurants()
+      .then((result) => {
+        if (active) setRestaurants(result)
+      })
+      .catch(() => {
+        if (active) setRestaurants([])
+      })
+    return () => {
+      active = false
+    }
+  }, [])
+
   const [accountType, setAccountType] = useState<AccountType>('diner')
   const [fname, setFname] = useState('')
   const [lname, setLname] = useState('')
@@ -35,6 +54,8 @@ export default function Signup() {
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [errors, setErrors] = useState<FieldErrors>({})
+  const [formError, setFormError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
 
   if (user) return <Navigate to={returnTo} replace />
 
@@ -67,26 +88,35 @@ export default function Signup() {
     return next
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault()
+    setFormError(null)
     const next = validate()
     setErrors(next)
     if (Object.keys(next).length > 0) return
 
-    const employer = mockRestaurants.find((r) => r.restPhone === employerPhone)
-
-    // Real implementation: POST /api/auth/signup with user_role and
-    // employer_phone, which creates the UserAccount row and signs in.
-    signIn({
-      email: email.trim(),
-      fname: fname.trim(),
-      lname: lname.trim(),
-      userPhone: userPhone.trim() || null,
-      userRole: isRestaurant ? 'STAFF' : 'DINER',
-      employerName: isRestaurant ? employer?.restName : undefined,
-    })
-
-    navigate(isRestaurant ? '/staff' : returnTo, { replace: true })
+    setSubmitting(true)
+    try {
+      const result = await signup({
+        email: email.trim(),
+        password,
+        userRole: isRestaurant ? 'STAFF' : 'DINER',
+        fname: fname.trim(),
+        lname: lname.trim(),
+        userPhone: userPhone.trim() || undefined,
+        employerPhone: isRestaurant ? employerPhone : undefined,
+      })
+      signIn(result)
+      navigate(isRestaurant ? '/staff' : returnTo, { replace: true })
+    } catch (err) {
+      setFormError(
+        err instanceof ApiError
+          ? err.message
+          : 'Could not create your account. Please try again.',
+      )
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -96,6 +126,12 @@ export default function Signup() {
         <p className={styles.subtitle}>
           You'll need one to hold a table or manage a restaurant's bookings.
         </p>
+
+        {formError && (
+          <p className={styles.formError} role="alert">
+            {formError}
+          </p>
+        )}
 
         <form onSubmit={handleSubmit} noValidate>
           <fieldset className={styles.typeGroup}>
@@ -145,7 +181,7 @@ export default function Signup() {
                 onChange={(e) => setEmployerPhone(e.target.value)}
               >
                 <option value="">Select a restaurant</option>
-                {mockRestaurants.map((r) => (
+                {restaurants.map((r) => (
                   <option key={r.restPhone} value={r.restPhone}>
                     {r.restName}
                   </option>
@@ -213,8 +249,12 @@ export default function Signup() {
             />
           </div>
 
-          <Button type="submit" variant="primary" fullWidth>
-            {isRestaurant ? 'Create restaurant account' : 'Create account'}
+          <Button type="submit" variant="primary" fullWidth disabled={submitting}>
+            {submitting
+              ? 'Creating account…'
+              : isRestaurant
+                ? 'Create restaurant account'
+                : 'Create account'}
           </Button>
         </form>
 

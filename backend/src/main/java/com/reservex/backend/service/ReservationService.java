@@ -57,8 +57,9 @@ public class ReservationService {
     }
 
 
-    public List<ReservationResponse> getAllReservations() {
-        return reservationRepository.findAll().stream()
+    /** A diner's own reservations — never another diner's, per the authenticated session. */
+    public List<ReservationResponse> getReservationsForDiner(String email) {
+        return reservationRepository.findByUser_EmailOrderBySlotDateDescSlotTimeDesc(email).stream()
                 .map(ReservationResponse::from)
                 .toList();
     }
@@ -99,9 +100,9 @@ public class ReservationService {
      * that table exists to prevent.
      */
     @Transactional
-    public ReservationResponse createReservation(ReservationRequest req) {
+    public ReservationResponse createReservation(ReservationRequest req, String dinerEmail) {
         Restaurant restaurant = restaurantService.getRestaurantEntity(req.restPhone());
-        UserAccount diner = userAccountService.getUserEntity(req.email());
+        UserAccount diner = userAccountService.getUserEntity(dinerEmail);
         var slot = reservationSlotService.getSlotEntity(req.restPhone(), req.slotDate(), req.slotTime());
 
         int alreadyBooked = reservationRepository.sumPartySizeForSlot(
@@ -137,9 +138,10 @@ public class ReservationService {
      * transaction. Mirrors ALLOWED_TRANSITIONS from the frontend's staff mock.
      */
     @Transactional
-    public ReservationResponse transitionStatus(Integer resNum, String toStatus, String changedByEmail) {
+    public ReservationResponse transitionStatus(Integer resNum, String toStatus, String actingEmail) {
         Reservation reservation = getReservationEntity(resNum);
-        UserAccount changedBy = userAccountService.getUserEntity(changedByEmail);
+        UserAccount changedBy = userAccountService.getUserEntity(actingEmail);
+        authorizeStatusChange(reservation, changedBy, toStatus);
 
         Set<String> allowed = ALLOWED_TRANSITIONS.getOrDefault(reservation.getResStatus(), Set.of());
         if (!allowed.contains(toStatus)) {
@@ -165,8 +167,11 @@ public class ReservationService {
      * transition.
      */
     @Transactional
-    public ReservationResponse updateReservation(Integer resNum, ReservationEditRequest req) {
+    public ReservationResponse updateReservation(Integer resNum, ReservationEditRequest req, String actingEmail) {
         Reservation reservation = getReservationEntity(resNum);
+        UserAccount actingUser = userAccountService.getUserEntity(actingEmail);
+        authorizeEdit(reservation, actingUser);
+
         String restPhone = reservation.getRestaurant().getRestPhone();
         var slot = reservationSlotService.getSlotEntity(restPhone, req.slotDate(), req.slotTime());
 
@@ -203,5 +208,40 @@ public class ReservationService {
         history.setChangedTo(status);
         history.setChangedBy(changedBy);
         reservationHistoryRepository.save(history);
+    }
+
+
+    private boolean isOwner(Reservation reservation, UserAccount user) {
+        return reservation.getUser().getEmail().equals(user.getEmail());
+    }
+
+
+    private boolean isStaffAtRestaurant(UserAccount user, String restPhone) {
+        return "STAFF".equals(user.getUserRole())
+                && user.getEmployer() != null
+                && user.getEmployer().getRestPhone().equals(restPhone);
+    }
+
+
+    /** Staff at the reservation's own restaurant may make any allowed
+     *  transition; a diner may only cancel their own booking. */
+    private void authorizeStatusChange(Reservation reservation, UserAccount actingUser, String toStatus) {
+        if (isStaffAtRestaurant(actingUser, reservation.getRestaurant().getRestPhone())) {
+            return;
+        }
+        if (isOwner(reservation, actingUser) && "CANCELLED".equals(toStatus)) {
+            return;
+        }
+        throw ApiException.forbidden("FORBIDDEN", "You can't make that change to this reservation.");
+    }
+
+
+    /** Staff at the reservation's own restaurant, or the diner who booked it. */
+    private void authorizeEdit(Reservation reservation, UserAccount actingUser) {
+        if (isStaffAtRestaurant(actingUser, reservation.getRestaurant().getRestPhone())
+                || isOwner(reservation, actingUser)) {
+            return;
+        }
+        throw ApiException.forbidden("FORBIDDEN", "You can't edit this reservation.");
     }
 }

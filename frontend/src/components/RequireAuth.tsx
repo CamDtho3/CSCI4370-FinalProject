@@ -9,8 +9,13 @@ import { useAuth } from '../context/AuthContext'
  * state.
  */
 export default function RequireAuth({ children }: { children: ReactNode }) {
-  const { user } = useAuth()
+  const { user, isLoading } = useAuth()
   const location = useLocation()
+
+  // Still restoring the session from the /api/auth/me check — wait
+  // rather than redirect, or a refresh on a protected route would
+  // flash straight to the login page before the cookie's even checked.
+  if (isLoading) return null
 
   if (!user) {
     const returnTo = encodeURIComponent(location.pathname + location.search)

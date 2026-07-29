@@ -56,6 +56,39 @@ public class UserAccountService {
     }
 
 
+    /**
+     * Verifies credentials for /auth/login. Deliberately the same error for
+     * "no such account" and "wrong password" — distinguishing them lets a
+     * caller enumerate registered emails.
+     */
+    public UserAccount authenticate(String email, String password) {
+        UserAccount user = userAccountRepository.findById(email)
+                .orElseThrow(() -> ApiException.unauthorized(
+                        "INVALID_CREDENTIALS", "Incorrect email or password."));
+
+        if (!passwordEncoder.matches(password, user.getPwdHash())) {
+            throw ApiException.unauthorized("INVALID_CREDENTIALS", "Incorrect email or password.");
+        }
+
+        return user;
+    }
+
+
+    /** Throws FORBIDDEN unless email is a STAFF account employed at restPhone. */
+    public UserAccount requireStaffAt(String email, String restPhone) {
+        UserAccount user = getUserEntity(email);
+        boolean isStaffHere = "STAFF".equals(user.getUserRole())
+                && user.getEmployer() != null
+                && user.getEmployer().getRestPhone().equals(restPhone);
+
+        if (!isStaffHere) {
+            throw ApiException.forbidden("FORBIDDEN", "You must be staff at this restaurant.");
+        }
+
+        return user;
+    }
+
+
     // CREATE user
     public UserAccountResponse createUser(UserAccountRequest req) {
         if (!VALID_ROLES.contains(req.userRole())) {

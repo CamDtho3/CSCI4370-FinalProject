@@ -2,27 +2,10 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import type { CurrentUser } from '../context/AuthContext'
+import { login } from '../api/auth'
+import { ApiError } from '../api/errors'
 import { Button, Input } from '../components/ui'
 import styles from './Login.module.css'
-
-/* Stand-ins until /api/auth exists. */
-const DEMO_DINER: CurrentUser = {
-  email: 'ana@example.com',
-  fname: 'Ana',
-  lname: 'Reyes',
-  userPhone: '706-555-0142',
-  userRole: 'DINER',
-}
-
-const DEMO_STAFF: CurrentUser = {
-  email: 'host@thenational.com',
-  fname: 'Cam',
-  lname: 'Dunn',
-  userPhone: '706-549-3450',
-  userRole: 'STAFF',
-  employerName: 'The National',
-}
 
 export default function Login() {
   const { user, signIn } = useAuth()
@@ -35,11 +18,12 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
   const [formError, setFormError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
 
   // Already signed in — nothing to do here.
   if (user) return <Navigate to={returnTo} replace />
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setFormError(null)
 
@@ -51,15 +35,18 @@ export default function Login() {
     setErrors(next)
     if (Object.keys(next).length > 0) return
 
-    // Real implementation: POST /api/auth/login, then signIn(response).
-    // Until then, any credentials sign you in as a diner.
-    signIn({ ...DEMO_DINER, email: email.trim() })
-    navigate(returnTo, { replace: true })
-  }
-
-  function devSignIn(as: CurrentUser) {
-    signIn(as)
-    navigate(returnTo, { replace: true })
+    setSubmitting(true)
+    try {
+      const result = await login(email.trim(), password)
+      signIn(result)
+      navigate(returnTo, { replace: true })
+    } catch (err) {
+      setFormError(
+        err instanceof ApiError ? err.message : 'Could not log in. Please try again.',
+      )
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -97,8 +84,8 @@ export default function Login() {
             />
           </div>
 
-          <Button type="submit" variant="primary" fullWidth>
-            Log in
+          <Button type="submit" variant="primary" fullWidth disabled={submitting}>
+            {submitting ? 'Logging in…' : 'Log in'}
           </Button>
         </form>
 
@@ -111,20 +98,6 @@ export default function Login() {
             Sign up
           </Link>
         </p>
-
-        <div className={styles.devPanel}>
-          <p className={styles.devLabel}>
-            Development only — remove once /api/auth exists
-          </p>
-          <div className={styles.devButtons}>
-            <Button size="sm" onClick={() => devSignIn(DEMO_DINER)}>
-              Sign in as diner
-            </Button>
-            <Button size="sm" onClick={() => devSignIn(DEMO_STAFF)}>
-              Sign in as staff
-            </Button>
-          </div>
-        </div>
       </div>
     </div>
   )

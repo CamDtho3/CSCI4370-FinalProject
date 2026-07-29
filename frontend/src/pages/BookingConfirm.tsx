@@ -101,16 +101,13 @@ export default function BookingConfirm() {
     setError(null)
 
     try {
-      const created = await createReservation(
-        {
-          restPhone,
-          slotDate: query.slotDate,
-          slotTime,
-          partySize: query.partySize,
-          specialReq,
-        },
-        user!.email,
-      )
+      const created = await createReservation({
+        restPhone,
+        slotDate: query.slotDate,
+        slotTime,
+        partySize: query.partySize,
+        specialReq,
+      })
       navigate(`/reservations/${created.resNum}`, {
         replace: true,
         state: { justBooked: true },

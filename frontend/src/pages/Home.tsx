@@ -21,7 +21,7 @@ export default function Home() {
   useEffect(() => {
     let active = true
 
-    getRestaurantsWithSlots(query.slotDate)
+    getRestaurantsWithSlots(query.slotDate, query.term)
       .then((result) => {
         if (active) setRestaurants(result)
       })
@@ -32,7 +32,7 @@ export default function Home() {
     return () => {
       active = false
     }
-  }, [query.slotDate])
+  }, [query.slotDate, query.term])
 
   // Unrated restaurants sort last rather than as zero.
   const topRated = useMemo(

@@ -26,6 +26,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     List<Reservation> findByRestaurant_RestPhoneAndSlotDateOrderBySlotTimeAsc(
             String restPhone, LocalDate slotDate);
 
+    List<Reservation> findByUser_EmailOrderBySlotDateDescSlotTimeDesc(String email);
+
     /** Same as sumPartySizeForSlot, but excludes one reservation's own party —
      *  used when editing, since its current seats are about to be released. */
     @Query("SELECT COALESCE(SUM(r.partySize), 0) FROM Reservation r "

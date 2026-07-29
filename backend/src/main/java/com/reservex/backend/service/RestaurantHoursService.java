@@ -21,14 +21,17 @@ public class RestaurantHoursService {
 
     private final RestaurantHoursRepository restaurantHoursRepository;
     private final RestaurantService restaurantService;
+    private final UserAccountService userAccountService;
 
 
     public RestaurantHoursService(
             RestaurantHoursRepository restaurantHoursRepository,
-            RestaurantService restaurantService) {
+            RestaurantService restaurantService,
+            UserAccountService userAccountService) {
 
         this.restaurantHoursRepository = restaurantHoursRepository;
         this.restaurantService = restaurantService;
+        this.userAccountService = userAccountService;
     }
 
 
@@ -66,8 +69,10 @@ public class RestaurantHoursService {
     }
 
 
-    // CREATE hours
-    public RestaurantHoursResponse createHours(RestaurantHoursRequest req) {
+    // CREATE hours — staff at the target restaurant only
+    public RestaurantHoursResponse createHours(RestaurantHoursRequest req, String actingEmail) {
+        userAccountService.requireStaffAt(actingEmail, req.restPhone());
+
         RestaurantHours hours = new RestaurantHours();
         hours.setRestaurant(restaurantService.getRestaurantEntity(req.restPhone()));
         hours.setDayOfWeek(req.dayOfWeek());
@@ -79,9 +84,10 @@ public class RestaurantHoursService {
     }
 
 
-    // DELETE hours — by composite key, not the full entity
-    public void deleteHours(RestaurantHoursId id) {
-        getHoursEntity(id); // 404 if missing
+    // DELETE hours — by composite key, not the full entity; staff at the restaurant only
+    public void deleteHours(RestaurantHoursId id, String actingEmail) {
+        RestaurantHours hours = getHoursEntity(id); // 404 if missing
+        userAccountService.requireStaffAt(actingEmail, hours.getRestaurant().getRestPhone());
         restaurantHoursRepository.deleteById(id);
     }
 }

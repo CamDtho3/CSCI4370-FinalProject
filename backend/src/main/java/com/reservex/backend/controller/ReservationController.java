@@ -1,5 +1,6 @@
 package com.reservex.backend.controller;
 
+import com.reservex.backend.common.auth.AuthSession;
 import com.reservex.backend.dto.ReservationEditRequest;
 import com.reservex.backend.dto.ReservationRequest;
 import com.reservex.backend.dto.ReservationResponse;
@@ -7,6 +8,7 @@ import com.reservex.backend.dto.ReservationStatusUpdateRequest;
 import com.reservex.backend.dto.StaffReservationResponse;
 import com.reservex.backend.service.ReservationService;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,10 +28,10 @@ public class ReservationController {
     }
 
 
-    // GET all reservations
+    // GET the signed-in diner's own reservations
     @GetMapping
-    public List<ReservationResponse> getAllReservations() {
-        return reservationService.getAllReservations();
+    public List<ReservationResponse> getMyReservations(HttpSession session) {
+        return reservationService.getReservationsForDiner(AuthSession.requireEmail(session));
     }
 
     // GET reservations by restaurant phone and date
@@ -64,9 +66,10 @@ public class ReservationController {
     // POST create reservation — capacity-checked, writes the first history row
     @PostMapping
     public ReservationResponse createReservation(
-            @Valid @RequestBody ReservationRequest reservation) {
+            @Valid @RequestBody ReservationRequest reservation,
+            HttpSession session) {
 
-        return reservationService.createReservation(reservation);
+        return reservationService.createReservation(reservation, AuthSession.requireEmail(session));
     }
 
 
@@ -74,9 +77,10 @@ public class ReservationController {
     @PatchMapping("/{id}/status")
     public ReservationResponse updateStatus(
             @PathVariable Integer id,
-            @Valid @RequestBody ReservationStatusUpdateRequest update) {
+            @Valid @RequestBody ReservationStatusUpdateRequest update,
+            HttpSession session) {
 
-        return reservationService.transitionStatus(id, update.toStatus(), update.changedByEmail());
+        return reservationService.transitionStatus(id, update.toStatus(), AuthSession.requireEmail(session));
     }
 
 
@@ -84,9 +88,10 @@ public class ReservationController {
     @PatchMapping("/{id}")
     public ReservationResponse updateReservation(
             @PathVariable Integer id,
-            @Valid @RequestBody ReservationEditRequest edit) {
+            @Valid @RequestBody ReservationEditRequest edit,
+            HttpSession session) {
 
-        return reservationService.updateReservation(id, edit);
+        return reservationService.updateReservation(id, edit, AuthSession.requireEmail(session));
     }
 
 

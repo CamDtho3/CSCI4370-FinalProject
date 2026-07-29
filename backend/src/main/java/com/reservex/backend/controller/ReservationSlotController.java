@@ -1,10 +1,12 @@
 package com.reservex.backend.controller;
 
+import com.reservex.backend.common.auth.AuthSession;
 import com.reservex.backend.dto.ReservationSlotRequest;
 import com.reservex.backend.dto.ReservationSlotResponse;
 import com.reservex.backend.entity.ReservationSlotId;
 import com.reservex.backend.service.ReservationSlotService;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,14 +46,15 @@ public class ReservationSlotController {
     }
 
 
-    // CREATE reservation slot
+    // CREATE reservation slot — staff at the target restaurant only
     // POST http://localhost:8080/api/reservation-slots
     @PostMapping
     public ResponseEntity<ReservationSlotResponse> createSlot(
-            @Valid @RequestBody ReservationSlotRequest slot) {
+            @Valid @RequestBody ReservationSlotRequest slot,
+            HttpSession session) {
 
         return ResponseEntity.ok(
-                reservationSlotService.createSlot(slot)
+                reservationSlotService.createSlot(slot, AuthSession.requireEmail(session))
         );
     }
 
@@ -60,9 +63,10 @@ public class ReservationSlotController {
     // DELETE http://localhost:8080/api/reservation-slots
     @DeleteMapping
     public ResponseEntity<Void> deleteSlot(
-            @RequestBody ReservationSlotId id) {
+            @RequestBody ReservationSlotId id,
+            HttpSession session) {
 
-        reservationSlotService.deleteSlot(id);
+        reservationSlotService.deleteSlot(id, AuthSession.requireEmail(session));
 
         return ResponseEntity.noContent().build();
     }

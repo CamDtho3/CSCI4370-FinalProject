@@ -1,5 +1,6 @@
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth, initials } from '../../context/AuthContext'
+import { logout } from '../../api/auth'
 import CompactSearch from '../search/CompactSearch'
 import Button from '../ui/Button'
 import styles from './Header.module.css'
@@ -15,6 +16,15 @@ export default function Header() {
 
   // Hero search owns the landing page; the compact one appears everywhere else.
   const showCompactSearch = pathname !== '/'
+
+  async function handleSignOut() {
+    try {
+      await logout()
+    } finally {
+      signOut()
+      navigate('/')
+    }
+  }
 
   return (
     <header className={styles.header}>
@@ -56,7 +66,7 @@ export default function Header() {
                 type="button"
                 className={styles.avatar}
                 title={`${user.fname} ${user.lname} — sign out`}
-                onClick={signOut}
+                onClick={handleSignOut}
               >
                 {initials(user)}
               </button>
@@ -75,7 +85,7 @@ export default function Header() {
                 type="button"
                 className={styles.avatar}
                 title={`${user.fname} ${user.lname} — sign out`}
-                onClick={signOut}
+                onClick={handleSignOut}
               >
                 {initials(user)}
               </button>
