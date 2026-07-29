@@ -11,7 +11,7 @@ public record RestaurantResponse(
     String city,
     String state,
     String cuisine,
-    String priceRange,
+    Integer priceRange,
     String imageUrl,
     LocalDateTime restCreated,
     Double avgRating,
