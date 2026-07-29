@@ -1,13 +1,17 @@
 import { useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import type { ReservationResponse } from '../api/types'
 import { Button, ReservationBadge } from '../components/ui'
 import {
   cancelMockReservation,
   findMockReservation,
   isCancellable,
+  remainingAtSlot,
+  updateMockReservation,
   MockApiError,
 } from '../mocks/reservations'
+import EditReservation from '../components/EditReservation'
+import type { ReservationEdit } from '../components/EditReservation'
 import { findMockRestaurant } from '../mocks/restaurants'
 import { formatTime } from '../lib/time'
 import styles from './ReservationDetail.module.css'
@@ -55,7 +59,19 @@ export default function ReservationDetail() {
   )
   const [confirming, setConfirming] = useState(false)
   const [cancelling, setCancelling] = useState(false)
+  // ?edit=1 opens the panel straight away — set by the Edit link on the
+  // reservations list, and preserved across a refresh.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [editing, setEditing] = useState(searchParams.get('edit') === '1')
   const [error, setError] = useState<string | null>(null)
+
+  function stopEditing() {
+    setEditing(false)
+    if (searchParams.has('edit')) {
+      searchParams.delete('edit')
+      setSearchParams(searchParams, { replace: true })
+    }
+  }
 
   if (!reservation) {
     return (
@@ -91,7 +107,15 @@ export default function ReservationDetail() {
     }
   }
 
+  // Editing follows the same window as cancelling: if a diner can call
+  // it off, they can change it.
   const cancellable = isCancellable(reservation)
+
+  async function handleSave(next: ReservationEdit) {
+    const updated = await updateMockReservation(resNum, next)
+    setReservation({ ...updated })
+    stopEditing()
+  }
 
   return (
     <div className={styles.wrap}>
@@ -162,7 +186,26 @@ export default function ReservationDetail() {
           </div>
         )}
 
-        {cancellable && (
+        {editing && (
+          <div className={styles.editWrap}>
+            <EditReservation
+              restPhone={reservation.restPhone}
+              initial={{
+                slotDate: reservation.slotDate,
+                slotTime: reservation.slotTime,
+                partySize: reservation.partySize,
+                specialReq: reservation.specialReq ?? '',
+              }}
+              remainingFor={(d, t) =>
+                remainingAtSlot(reservation!.restPhone, d, t, resNum)
+              }
+              onSave={handleSave}
+              onCancel={stopEditing}
+            />
+          </div>
+        )}
+
+        {cancellable && !editing && (
           <div className={styles.actions}>
             {confirming ? (
               <>
@@ -186,9 +229,14 @@ export default function ReservationDetail() {
                 </Button>
               </>
             ) : (
-              <Button size="sm" onClick={() => setConfirming(true)}>
-                Cancel reservation
-              </Button>
+              <>
+                <Button variant="primary" size="sm" onClick={() => setEditing(true)}>
+                  Edit
+                </Button>
+                <Button size="sm" onClick={() => setConfirming(true)}>
+                  Cancel reservation
+                </Button>
+              </>
             )}
           </div>
         )}

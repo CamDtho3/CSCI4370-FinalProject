@@ -7,9 +7,13 @@ import {
   ALLOWED_TRANSITIONS,
   STATUS_ACTION_LABEL,
   listStaffReservations,
+  remainingAtStaffSlot,
   summarise,
   transitionStaffReservation,
+  updateStaffReservation,
 } from '../mocks/staff'
+import EditReservation from '../components/EditReservation'
+import type { ReservationEdit } from '../components/EditReservation'
 import { MockApiError } from '../mocks/reservations'
 import { formatTime } from '../lib/time'
 import styles from './StaffToday.module.css'
@@ -26,11 +30,14 @@ function timeOfDay(iso: string): string {
 function ReservationRow({
   r,
   onTransition,
+  onEdit,
 }: {
   r: StaffReservationResponse
   onTransition: (to: ReservationStatus) => Promise<void>
+  onEdit: (next: ReservationEdit) => Promise<void>
 }) {
   const [showHistory, setShowHistory] = useState(false)
+  const [editing, setEditing] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -90,6 +97,14 @@ function ReservationRow({
           </Button>
         ))}
 
+        {/* Staff may edit up to the moment of service — no two-hour
+            window, unlike diners. */}
+        {!resolved && (
+          <Button size="sm" disabled={busy} onClick={() => setEditing((v) => !v)}>
+            {editing ? 'Close' : 'Edit'}
+          </Button>
+        )}
+
         <button
           type="button"
           className={styles.historyToggle}
@@ -100,6 +115,28 @@ function ReservationRow({
       </div>
 
       {error && <p className={styles.error} role="alert">{error}</p>}
+
+      {editing && (
+        <div className={styles.editWrap}>
+          <EditReservation
+            restPhone={r.restPhone}
+            initial={{
+              slotDate: r.slotDate,
+              slotTime: r.slotTime,
+              partySize: r.partySize,
+              specialReq: r.specialReq ?? '',
+            }}
+            remainingFor={(d, t) =>
+              remainingAtStaffSlot(r.restPhone, d, t, r.resNum)
+            }
+            onSave={async (nextEdit) => {
+              await onEdit(nextEdit)
+              setEditing(false)
+            }}
+            onCancel={() => setEditing(false)}
+          />
+        </div>
+      )}
 
       {showHistory && (
         <div className={styles.history}>
@@ -132,6 +169,11 @@ export default function StaffToday() {
 
   async function handleTransition(resNum: string, to: ReservationStatus) {
     await transitionStaffReservation(resNum, to, user!.email)
+    setVersion((v) => v + 1)
+  }
+
+  async function handleEdit(resNum: string, next: ReservationEdit) {
+    await updateStaffReservation(resNum, next)
     setVersion((v) => v + 1)
   }
 
@@ -185,6 +227,7 @@ export default function StaffToday() {
               key={r.resNum}
               r={r}
               onTransition={(to) => handleTransition(r.resNum, to)}
+              onEdit={(next) => handleEdit(r.resNum, next)}
             />
           ))}
         </div>

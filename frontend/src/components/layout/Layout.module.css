@@ -13,8 +13,6 @@
   max-width: var(--container-narrow);
 }
 
-/* Landing page — full bleed so the hero's background reaches the
-   viewport edges. Home manages its own inner widths and padding. */
 .flush {
   padding: 0;
   max-width: none;

@@ -61,11 +61,6 @@
   text-decoration: underline;
 }
 
-/* --- Development only ---------------------------------------------
-   Delete this block once /api/auth exists. It stands in for a real
-   backend so both signed-in states can be exercised.
-   ------------------------------------------------------------------ */
-
 .devPanel {
   margin-top: var(--space-6);
   padding: var(--space-4);

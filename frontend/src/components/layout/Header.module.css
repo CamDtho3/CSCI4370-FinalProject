@@ -17,8 +17,6 @@
   gap: var(--space-4);
 }
 
-/* Left and right zones hold position whether or not the centre search
-   is present, so the header doesn't shift between routes. */
 .left {
   display: flex;
   align-items: center;

@@ -22,11 +22,6 @@
   margin-bottom: var(--space-6);
 }
 
-/* --- Account type ------------------------------------------------
-   Native radios, visually hidden. Keeps arrow-key navigation and
-   screen-reader semantics without styling the inputs themselves.
-   ------------------------------------------------------------------ */
-
 .typeGroup {
   margin-bottom: var(--space-6);
 }
@@ -90,11 +85,6 @@
   font-size: var(--text-sm);
   color: var(--c-text-secondary);
 }
-
-/* --- Employer block ----------------------------------------------
-   Only rendered for restaurant accounts. Set apart so it reads as a
-   consequence of the choice above rather than another ordinary field.
-   ------------------------------------------------------------------ */
 
 .employer {
   display: flex;

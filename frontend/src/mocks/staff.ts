@@ -4,6 +4,7 @@ import type {
   StatusHistoryEntry,
 } from '../api/types'
 import { MockApiError } from './reservations'
+import { mockSlotsFor } from './restaurants'
 
 /* ===================================================================
    Staff-side reservation store.
@@ -172,6 +173,84 @@ export async function transitionStaffReservation(
 
   found.resStatus = to
   found.history = [...found.history, entry]
+  return { ...found }
+}
+
+/**
+ * Seats still free at a slot, counting only this restaurant's bookings.
+ * `excludeResNum` adds that reservation's own party back, since editing
+ * releases its current seats.
+ */
+export function remainingAtStaffSlot(
+  restPhone: string,
+  slotDate: string,
+  slotTime: string,
+  excludeResNum?: string,
+): number {
+  const slot = mockSlotsFor(restPhone, slotDate).find(
+    (s) => s.slotTime === slotTime,
+  )
+  if (!slot) return 0
+
+  const booked = staffReservations
+    .filter(
+      (r) =>
+        r.restPhone === restPhone &&
+        r.slotDate === slotDate &&
+        r.slotTime === slotTime &&
+        r.resNum !== excludeResNum &&
+        r.resStatus !== 'CANCELLED' &&
+        r.resStatus !== 'NO_SHOW',
+    )
+    .reduce((sum, r) => sum + r.partySize, 0)
+
+  return Math.max(0, slot.availableSpots - booked)
+}
+
+/**
+ * Applies an edit on the staff side.
+ *
+ * Staff are not held to the diner's two-hour cancellation window — a
+ * host moving a guest to a larger table mid-service is the normal case.
+ * No history row is written; an edit is not a status transition.
+ */
+export async function updateStaffReservation(
+  resNum: string,
+  next: {
+    slotDate: string
+    slotTime: string
+    partySize: number
+    specialReq: string
+  },
+): Promise<StaffReservationResponse> {
+  await new Promise((r) => setTimeout(r, 350))
+
+  const found = staffReservations.find((r) => r.resNum === resNum)
+  if (!found) {
+    throw new MockApiError(404, 'NOT_FOUND', 'That reservation no longer exists.')
+  }
+
+  const remaining = remainingAtStaffSlot(
+    found.restPhone,
+    next.slotDate,
+    next.slotTime,
+    resNum,
+  )
+  if (next.partySize > remaining) {
+    throw new MockApiError(
+      409,
+      'SLOT_FULL',
+      remaining > 0
+        ? `Only ${remaining} ${remaining === 1 ? 'seat' : 'seats'} remain at that time.`
+        : 'That time is fully booked.',
+    )
+  }
+
+  found.slotDate = next.slotDate
+  found.slotTime = next.slotTime
+  found.partySize = next.partySize
+  found.specialReq = next.specialReq.trim() || null
+
   return { ...found }
 }
 

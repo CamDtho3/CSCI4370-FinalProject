@@ -148,6 +148,89 @@ export async function cancelMockReservation(
   return found
 }
 
+/**
+ * Seats still free at a slot.
+ *
+ * `excludeResNum` adds that reservation's own party back — when editing,
+ * its existing seats are about to be released, so they count as
+ * available. Without it a diner could not keep the party size they
+ * already have.
+ */
+export function remainingAtSlot(
+  restPhone: string,
+  slotDate: string,
+  slotTime: string,
+  excludeResNum?: string,
+): number {
+  const slot = mockSlotsFor(restPhone, slotDate).find(
+    (s) => s.slotTime === slotTime,
+  )
+  if (!slot) return 0
+
+  const booked = reservations
+    .filter(
+      (r) =>
+        r.restPhone === restPhone &&
+        r.slotDate === slotDate &&
+        r.slotTime === slotTime &&
+        r.resNum !== excludeResNum &&
+        r.resStatus !== 'CANCELLED' &&
+        r.resStatus !== 'NO_SHOW',
+    )
+    .reduce((sum, r) => sum + r.partySize, 0)
+
+  return Math.max(0, slot.availableSpots - booked)
+}
+
+/**
+ * Applies an edit. Party size, slot, and requests only — the restaurant
+ * and the diner are fixed, and changing either would be a different
+ * reservation rather than an edit.
+ *
+ * No ReservationStatusHistory row is written: an edit is not a status
+ * transition, and forcing one in would put a meaningless value in
+ * changed_to.
+ */
+export async function updateMockReservation(
+  resNum: string,
+  next: {
+    slotDate: string
+    slotTime: string
+    partySize: number
+    specialReq: string
+  },
+): Promise<ReservationResponse> {
+  await new Promise((r) => setTimeout(r, 350))
+
+  const found = reservations.find((r) => r.resNum === resNum)
+  if (!found) {
+    throw new MockApiError(404, 'NOT_FOUND', 'That reservation no longer exists.')
+  }
+
+  const remaining = remainingAtSlot(
+    found.restPhone,
+    next.slotDate,
+    next.slotTime,
+    resNum,
+  )
+  if (next.partySize > remaining) {
+    throw new MockApiError(
+      409,
+      'SLOT_FULL',
+      remaining > 0
+        ? `Only ${remaining} ${remaining === 1 ? 'seat' : 'seats'} remain at that time.`
+        : 'That time just filled up.',
+    )
+  }
+
+  found.slotDate = next.slotDate
+  found.slotTime = next.slotTime
+  found.partySize = next.partySize
+  found.specialReq = next.specialReq.trim() || null
+
+  return { ...found }
+}
+
 /** True while the booking is still in the future and not yet resolved. */
 export function isUpcoming(r: ReservationResponse): boolean {
   if (r.resStatus === 'CANCELLED' || r.resStatus === 'COMPLETED' || r.resStatus === 'NO_SHOW') {

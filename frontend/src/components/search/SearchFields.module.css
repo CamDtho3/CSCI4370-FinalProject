@@ -1,6 +1,3 @@
-/* Shared by the hero search and the expanded compact search. The `hero`
-   modifier scales it up; the base size is what sits in the header popover. */
-
 .form {
   display: flex;
   align-items: flex-end;

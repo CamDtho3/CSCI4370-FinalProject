@@ -21,10 +21,6 @@
   color: var(--c-text-muted);
 }
 
-/* --- Variants ----------------------------------------------------
-   One primary per screen. Everything else is secondary or ghost.
-   ----------------------------------------------------------------- */
-
 .primary {
   background: var(--c-accent);
   border: 1px solid var(--c-accent);
@@ -72,8 +68,6 @@
 .danger:hover:not(:disabled) {
   filter: brightness(0.92);
 }
-
-/* --- Sizes -------------------------------------------------------- */
 
 .sm {
   height: var(--control-height-sm);

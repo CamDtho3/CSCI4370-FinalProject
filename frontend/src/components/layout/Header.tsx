@@ -46,7 +46,7 @@ export default function Header() {
 
           {user && !isStaff && (
             <>
-              <NavLink to="/search" className={navClass}>
+              <NavLink to="/" end className={navClass}>
                 Browse
               </NavLink>
               <NavLink to="/reservations" className={navClass}>
