@@ -1,5 +1,6 @@
 package com.reservex.backend.controller;
 
+import com.reservex.backend.dto.ReviewResponse;
 import com.reservex.backend.entity.Review;
 import com.reservex.backend.entity.ReviewId;
 import com.reservex.backend.service.ReviewService;
@@ -10,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/reviews")
-@CrossOrigin(origins = "*")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -23,17 +23,19 @@ public class ReviewController {
 
     // GET all reviews
     @GetMapping
-    public List<Review> getAllReviews() {
-        return reviewService.getAllReviews();
+    public List<ReviewResponse> getAllReviews() {
+        return reviewService.getAllReviews().stream()
+                .map(ReviewResponse::from)
+                .toList();
     }
 
 
     // POST create review
     @PostMapping
-    public Review createReview(
+    public ReviewResponse createReview(
             @RequestBody Review review) {
 
-        return reviewService.createReview(review);
+        return ReviewResponse.from(reviewService.createReview(review));
     }
 
 

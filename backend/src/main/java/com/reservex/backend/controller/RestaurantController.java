@@ -1,5 +1,7 @@
 package com.reservex.backend.controller;
 
+import com.reservex.backend.common.exception.ApiException;
+import com.reservex.backend.dto.RestaurantResponse;
 import com.reservex.backend.entity.Restaurant;
 import com.reservex.backend.service.RestaurantService;
 
@@ -10,7 +12,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/restaurants")
-@CrossOrigin
 public class RestaurantController {
 
 
@@ -24,28 +25,32 @@ public class RestaurantController {
 
     // GET all restaurants
     @GetMapping
-    public List<Restaurant> getAllRestaurants() {
-        return restaurantService.getAllRestaurants();
+    public List<RestaurantResponse> getAllRestaurants() {
+        return restaurantService.getAllRestaurants().stream()
+                .map(RestaurantResponse::from)
+                .toList();
     }
 
 
     // GET restaurant by phone
     @GetMapping("/{restPhone}")
-    public Restaurant getRestaurantById(
+    public RestaurantResponse getRestaurantById(
             @PathVariable String restPhone) {
 
         return restaurantService
                 .getRestaurantById(restPhone)
-                .orElse(null);
+                .map(RestaurantResponse::from)
+                .orElseThrow(() -> ApiException.notFound(
+                        "NOT_FOUND", "That restaurant no longer exists."));
     }
 
 
     // CREATE restaurant
     @PostMapping
-    public Restaurant createRestaurant(
+    public RestaurantResponse createRestaurant(
             @RequestBody Restaurant restaurant) {
 
-        return restaurantService.createRestaurant(restaurant);
+        return RestaurantResponse.from(restaurantService.createRestaurant(restaurant));
     }
 
 

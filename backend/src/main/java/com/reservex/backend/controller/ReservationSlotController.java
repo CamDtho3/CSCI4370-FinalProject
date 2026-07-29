@@ -1,5 +1,6 @@
 package com.reservex.backend.controller;
 
+import com.reservex.backend.dto.ReservationSlotResponse;
 import com.reservex.backend.entity.ReservationSlot;
 import com.reservex.backend.entity.ReservationSlotId;
 import com.reservex.backend.service.ReservationSlotService;
@@ -11,7 +12,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/reservation-slots")
-@CrossOrigin(origins = "*")
 public class ReservationSlotController {
 
     private final ReservationSlotService reservationSlotService;
@@ -25,19 +25,22 @@ public class ReservationSlotController {
     // GET all reservation slots
     // GET http://localhost:8080/api/reservation-slots
     @GetMapping
-    public ResponseEntity<List<ReservationSlot>> getAllSlots() {
-        return ResponseEntity.ok(reservationSlotService.getAllSlots());
+    public ResponseEntity<List<ReservationSlotResponse>> getAllSlots() {
+        return ResponseEntity.ok(
+                reservationSlotService.getAllSlots().stream()
+                        .map(ReservationSlotResponse::from)
+                        .toList());
     }
 
 
     // CREATE reservation slot
     // POST http://localhost:8080/api/reservation-slots
     @PostMapping
-    public ResponseEntity<ReservationSlot> createSlot(
+    public ResponseEntity<ReservationSlotResponse> createSlot(
             @RequestBody ReservationSlot slot) {
 
         return ResponseEntity.ok(
-                reservationSlotService.createSlot(slot)
+                ReservationSlotResponse.from(reservationSlotService.createSlot(slot))
         );
     }
 

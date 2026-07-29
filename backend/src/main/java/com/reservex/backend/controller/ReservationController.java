@@ -1,8 +1,9 @@
 package com.reservex.backend.controller;
 
+import com.reservex.backend.common.exception.ApiException;
+import com.reservex.backend.dto.ReservationResponse;
 import com.reservex.backend.entity.Reservation;
 import com.reservex.backend.service.ReservationService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,37 +22,39 @@ public class ReservationController {
 
     // GET all reservations
     @GetMapping
-    public List<Reservation> getAllReservations() {
-        return reservationService.getAllReservations();
+    public List<ReservationResponse> getAllReservations() {
+        return reservationService.getAllReservations().stream()
+                .map(ReservationResponse::from)
+                .toList();
     }
 
 
     // GET reservation by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Reservation> getReservationById(
+    public ReservationResponse getReservationById(
             @PathVariable Integer id) {
 
         return reservationService.getReservationById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(ReservationResponse::from)
+                .orElseThrow(() -> ApiException.notFound(
+                        "NOT_FOUND", "That reservation no longer exists."));
     }
 
 
     // POST create reservation
     @PostMapping
-    public Reservation createReservation(
+    public ReservationResponse createReservation(
             @RequestBody Reservation reservation) {
 
-        return reservationService.createReservation(reservation);
+        return ReservationResponse.from(reservationService.createReservation(reservation));
     }
 
 
     // DELETE reservation
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReservation(
+    public void deleteReservation(
             @PathVariable Integer id) {
 
         reservationService.deleteReservation(id);
-        return ResponseEntity.noContent().build();
     }
 }

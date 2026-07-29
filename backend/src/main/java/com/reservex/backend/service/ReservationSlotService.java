@@ -1,5 +1,6 @@
 package com.reservex.backend.service;
 
+import com.reservex.backend.common.exception.ApiException;
 import com.reservex.backend.entity.ReservationSlot;
 import com.reservex.backend.entity.ReservationSlotId;
 import com.reservex.backend.repository.ReservationSlotRepository;
@@ -32,7 +33,7 @@ public class ReservationSlotService {
 
         return reservationSlotRepository.findById(id)
                 .orElseThrow(() ->
-                    new RuntimeException("Reservation slot not found"));
+                    ApiException.notFound("NOT_FOUND", "That reservation slot no longer exists."));
     }
 
 

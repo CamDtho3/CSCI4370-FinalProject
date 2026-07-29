@@ -1,5 +1,7 @@
 package com.reservex.backend.controller;
 
+import com.reservex.backend.common.exception.ApiException;
+import com.reservex.backend.dto.UserAccountResponse;
 import com.reservex.backend.entity.UserAccount;
 import com.reservex.backend.service.UserAccountService;
 
@@ -10,7 +12,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
-@CrossOrigin
 public class UserAccountController {
 
 
@@ -24,26 +25,32 @@ public class UserAccountController {
 
     // GET all users
     @GetMapping
-    public List<UserAccount> getAllUsers() {
-        return userAccountService.getAllUsers();
+    public List<UserAccountResponse> getAllUsers() {
+        return userAccountService.getAllUsers().stream()
+                .map(UserAccountResponse::from)
+                .toList();
     }
 
 
     // GET user by email
     @GetMapping("/{email}")
-    public UserAccount getUserByEmail(
+    public UserAccountResponse getUserByEmail(
             @PathVariable String email) {
 
-        return userAccountService.getUserByEmail(email);
+        UserAccount user = userAccountService.getUserByEmail(email);
+        if (user == null) {
+            throw ApiException.notFound("NOT_FOUND", "That account no longer exists.");
+        }
+        return UserAccountResponse.from(user);
     }
 
 
     // CREATE user
     @PostMapping
-    public UserAccount createUser(
+    public UserAccountResponse createUser(
             @RequestBody UserAccount user) {
 
-        return userAccountService.createUser(user);
+        return UserAccountResponse.from(userAccountService.createUser(user));
     }
 
 
