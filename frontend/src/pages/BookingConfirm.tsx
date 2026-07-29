@@ -5,8 +5,8 @@ import { useAuth } from '../context/AuthContext'
 import { useSearch } from '../context/SearchContext'
 import type { RestaurantResponse } from '../api/types'
 import { Button, Textarea } from '../components/ui'
-import { findRestaurant } from '../mocks/restaurants'
-import { createMockReservation, MockApiError } from '../mocks/reservations'
+import { findRestaurant } from '../api/restaurants'
+import { createReservation, ApiError } from '../api/reservations'
 import { formatTime } from '../lib/time'
 import styles from './BookingConfirm.module.css'
 
@@ -101,7 +101,7 @@ export default function BookingConfirm() {
     setError(null)
 
     try {
-      const created = await createMockReservation(
+      const created = await createReservation(
         {
           restPhone,
           slotDate: query.slotDate,
@@ -116,7 +116,7 @@ export default function BookingConfirm() {
         state: { justBooked: true },
       })
     } catch (err) {
-      if (err instanceof MockApiError && err.code === 'SLOT_FULL') {
+      if (err instanceof ApiError && err.code === 'SLOT_FULL') {
         // Someone booked between page load and submit. Send them back
         // to pick again rather than leaving them on a dead form.
         setError({ title: 'That time is no longer available', body: err.message })

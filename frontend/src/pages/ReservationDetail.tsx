@@ -1,18 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import type { ReservationResponse } from '../api/types'
 import { Button, ReservationBadge } from '../components/ui'
-import {
-  cancelMockReservation,
-  findMockReservation,
-  isCancellable,
-  remainingAtSlot,
-  updateMockReservation,
-  MockApiError,
-} from '../mocks/reservations'
+import { cancelReservation, findReservation, isCancellable, ApiError } from '../api/reservations'
+// Editing isn't backed by a real endpoint yet, so it still runs on the
+// mock — including remainingAtSlot's capacity check, which can't see
+// bookings made through the real API. See api/reservations.ts.
+import { remainingAtSlot, updateMockReservation } from '../mocks/reservations'
 import EditReservation from '../components/EditReservation'
 import type { ReservationEdit } from '../components/EditReservation'
-import { findRestaurant } from '../mocks/restaurants'
+import { findRestaurant } from '../api/restaurants'
 import { formatTime } from '../lib/time'
 import styles from './ReservationDetail.module.css'
 
@@ -48,6 +46,7 @@ export default function ReservationDetail() {
   const { resNum = '' } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
+  const { user } = useAuth()
 
   // Set by BookingConfirm on success. Router state is right here —
   // it's a nicety, and losing it on refresh is correct behaviour.
@@ -55,8 +54,9 @@ export default function ReservationDetail() {
     ?.justBooked
 
   const [reservation, setReservation] = useState<ReservationResponse | undefined>(
-    () => findMockReservation(resNum),
+    undefined,
   )
+  const [loadingReservation, setLoadingReservation] = useState(true)
   const [restaurant, setRestaurant] = useState<
     | {
         restPhone: string
@@ -84,6 +84,26 @@ export default function ReservationDetail() {
       setSearchParams(searchParams, { replace: true })
     }
   }
+
+  useEffect(() => {
+    let active = true
+
+    setLoadingReservation(true)
+    findReservation(resNum)
+      .then((result) => {
+        if (active) setReservation(result)
+      })
+      .catch(() => {
+        if (active) setReservation(undefined)
+      })
+      .finally(() => {
+        if (active) setLoadingReservation(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [resNum])
 
   useEffect(() => {
     if (!reservation) return
@@ -120,6 +140,15 @@ export default function ReservationDetail() {
     }
   }, [reservation?.restPhone])
 
+  if (loadingReservation) {
+    return (
+      <div className={styles.missing}>
+        <h1>Loading reservation</h1>
+        <p className={styles.missingText}>Fetching your booking.</p>
+      </div>
+    )
+  }
+
   if (!reservation) {
     return (
       <div className={styles.missing}>
@@ -138,12 +167,12 @@ export default function ReservationDetail() {
     setCancelling(true)
     setError(null)
     try {
-      const updated = await cancelMockReservation(resNum)
+      const updated = await cancelReservation(resNum, user!.email)
       setReservation({ ...updated })
       setConfirming(false)
     } catch (err) {
       setError(
-        err instanceof MockApiError
+        err instanceof ApiError
           ? err.message
           : 'Could not cancel. Please try again.',
       )

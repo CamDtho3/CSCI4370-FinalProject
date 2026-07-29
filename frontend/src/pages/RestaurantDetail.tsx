@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useSearch } from '../context/SearchContext'
 import type { RestaurantResponse } from '../api/types'
 import { Button, Select, partySizeOptions } from '../components/ui'
-import { findRestaurant, mockSlotsFor } from '../mocks/restaurants'
+import { findRestaurant, SlotsFor } from '../api/restaurants'
 import { formatTime, mealPeriodOf } from '../lib/time'
 import type { TimeSlotResponse } from '../api/types'
 import styles from './RestaurantDetail.module.css'
@@ -55,10 +55,28 @@ export default function RestaurantDetail() {
     }
   }, [restPhone])
 
-  const slots = useMemo(
-    () => mockSlotsFor(restPhone, query.slotDate),
-    [restPhone, query.slotDate],
-  )
+  const [slots, setSlots] = useState<TimeSlotResponse[]>([])
+  const [loadingSlots, setLoadingSlots] = useState(true)
+
+  useEffect(() => {
+    let active = true
+
+    setLoadingSlots(true)
+    SlotsFor(restPhone, query.slotDate)
+      .then((result) => {
+        if (active) setSlots(result)
+      })
+      .catch(() => {
+        if (active) setSlots([])
+      })
+      .finally(() => {
+        if (active) setLoadingSlots(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [restPhone, query.slotDate])
 
   if (loadingRestaurant) {
     return (
@@ -169,7 +187,9 @@ export default function RestaurantDetail() {
 
         <p className={styles.slotsLabel}>Available times</p>
 
-        {slots.every((s) => s.availableSpots < query.partySize) ? (
+        {loadingSlots ? (
+          <p className={styles.noSlots}>Loading times…</p>
+        ) : slots.every((s) => s.availableSpots < query.partySize) ? (
           <p className={styles.noSlots}>
             No tables for {query.partySize}{' '}
             {query.partySize === 1 ? 'guest' : 'guests'} on this date.

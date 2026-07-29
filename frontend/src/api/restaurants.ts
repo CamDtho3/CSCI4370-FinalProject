@@ -5,7 +5,16 @@ import type {
   TimeSlotResponse,
   RestaurantWithSlots,
 } from './types'
-import { mockRestaurants, mockSlotsFor } from '../mocks/restaurants.ts'
+
+export async function getAllRestaurants(): Promise<RestaurantResponse[]> {
+  const response = await fetch('/api/restaurants')
+
+  if (!response.ok) {
+    throw new Error('Failed to load restaurants')
+  }
+
+  return (await response.json()) as RestaurantResponse[]
+}
 
 export async function getRestaurantByPhone(
   restPhone: string,
@@ -53,13 +62,17 @@ export async function getReservationsByRestaurantAndDate(
   return (await response.json()) as ReservationResponse[]
 }
 
-export function RestaurantsWithSlots(
+export async function getRestaurantsWithSlots(
   slotDate: string,
-): RestaurantWithSlots[] {
-  return mockRestaurants.map((r) => ({
-    ...r,
-    slots: mockSlotsFor(r.restPhone, slotDate),
-  }))
+): Promise<RestaurantWithSlots[]> {
+  const restaurants = await getAllRestaurants()
+
+  return Promise.all(
+    restaurants.map(async (r) => ({
+      ...r,
+      slots: await SlotsFor(r.restPhone, slotDate),
+    })),
+  )
 }
 
 /**

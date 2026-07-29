@@ -1,11 +1,8 @@
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import type { ReservationResponse } from '../api/types'
 import { Button, ReservationBadge } from '../components/ui'
-import {
-  listMockReservations,
-  isUpcoming,
-  isCancellable,
-} from '../mocks/reservations'
+import { listReservations, isUpcoming, isCancellable } from '../api/reservations'
 import { formatTime } from '../lib/time'
 import styles from './MyReservations.module.css'
 
@@ -63,12 +60,36 @@ function ReservationRow({
 
 export default function MyReservations() {
   const navigate = useNavigate()
+  const [all, setAll] = useState<ReservationResponse[]>([])
+  const [loading, setLoading] = useState(true)
 
-  // Swap for a fetch once GET /api/reservations exists. The endpoint
-  // scopes to the authenticated diner; the mock has one user.
-  const all = listMockReservations()
+  // Server-side this should scope to the authenticated diner — see the
+  // auth flow item on the backend punch list. For now it's everyone's.
+  useEffect(() => {
+    let active = true
+
+    listReservations()
+      .then((result) => {
+        if (active) setAll(result)
+      })
+      .catch(() => {
+        if (active) setAll([])
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [])
+
   const upcoming = all.filter(isUpcoming)
   const past = all.filter((r) => !isUpcoming(r))
+
+  if (loading) {
+    return <h1 className={styles.title}>Your reservations</h1>
+  }
 
   if (all.length === 0) {
     return (

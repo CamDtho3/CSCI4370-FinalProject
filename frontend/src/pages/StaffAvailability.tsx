@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { mockSlotsFor } from '../mocks/restaurants'
-import { listStaffReservations } from '../mocks/staff'
+import { SlotsFor, getReservationsByRestaurantAndDate } from '../api/restaurants'
+import type { ReservationResponse, TimeSlotResponse } from '../api/types'
 import { formatTime, mealPeriodOf } from '../lib/time'
 import styles from './StaffAvailability.module.css'
 
@@ -14,11 +14,37 @@ export default function StaffAvailability() {
   const [slotDate, setSlotDate] = useState(() =>
     new Date().toISOString().slice(0, 10),
   )
+  const [slots, setSlots] = useState<TimeSlotResponse[]>([])
+  const [reservations, setReservations] = useState<ReservationResponse[]>([])
+
+  useEffect(() => {
+    if (!isStaff) return
+
+    let active = true
+
+    Promise.all([
+      SlotsFor(STAFF_REST_PHONE, slotDate),
+      getReservationsByRestaurantAndDate(STAFF_REST_PHONE, slotDate),
+    ])
+      .then(([slotsResult, reservationsResult]) => {
+        if (!active) return
+        setSlots(slotsResult)
+        setReservations(reservationsResult)
+      })
+      .catch(() => {
+        if (!active) return
+        setSlots([])
+        setReservations([])
+      })
+
+    return () => {
+      active = false
+    }
+  }, [slotDate, isStaff])
 
   if (!isStaff) return <Navigate to="/" replace />
 
-  const slots = mockSlotsFor(STAFF_REST_PHONE, slotDate)
-  const booked = listStaffReservations(STAFF_REST_PHONE, slotDate).filter(
+  const booked = reservations.filter(
     (r) => r.resStatus !== 'CANCELLED' && r.resStatus !== 'NO_SHOW',
   )
 

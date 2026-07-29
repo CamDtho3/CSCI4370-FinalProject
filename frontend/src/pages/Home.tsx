@@ -1,8 +1,9 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearch } from '../context/SearchContext'
 import SearchFields from '../components/search/SearchFields'
 import CardSection from '../components/CardSection'
-import { RestaurantsWithSlots } from '../api/restaurants'
+import { getRestaurantsWithSlots } from '../api/restaurants'
+import type { RestaurantWithSlots } from '../api/types'
 import styles from './Home.module.css'
 
 function formatDate(iso: string): string {
@@ -15,12 +16,23 @@ function formatDate(iso: string): string {
 
 export default function Home() {
   const { query } = useSearch()
+  const [restaurants, setRestaurants] = useState<RestaurantWithSlots[]>([])
 
-  // Swap for a real fetch once /api/restaurants exists.
-  const restaurants = useMemo(
-    () => RestaurantsWithSlots(query.slotDate),
-    [query.slotDate],
-  )
+  useEffect(() => {
+    let active = true
+
+    getRestaurantsWithSlots(query.slotDate)
+      .then((result) => {
+        if (active) setRestaurants(result)
+      })
+      .catch(() => {
+        if (active) setRestaurants([])
+      })
+
+    return () => {
+      active = false
+    }
+  }, [query.slotDate])
 
   // Unrated restaurants sort last rather than as zero.
   const topRated = useMemo(
