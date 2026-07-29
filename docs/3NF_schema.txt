@@ -1,0 +1,65 @@
+Restaurant(
+    rest_phone PK,
+    rest_name,
+    street,
+    zip,
+    city,
+    state,
+    cuisine,
+    price_range,
+    image_url,
+    rest_created
+)
+
+ReservationSlot(
+    rest_phone PK/FK,
+    slot_date PK,
+    slot_time PK,
+    slot_capacity
+)
+
+RestaurantHours(
+    rest_phone PK/FK,
+    day_of_week PK,
+    open_time,
+    close_time,
+    is_closed
+)
+
+UserAccount(
+    email PK,
+    pwd_hash,
+    user_role,
+    fname,
+    lname,
+    user_phone,
+    acct_created,
+    employer_phone FK
+)
+
+Reservation(
+    res_num PK,
+    party_size,
+    special_req,
+    res_status,
+    res_created,
+    slot_date,
+    slot_time,
+    rest_phone FK,
+    email FK
+)
+
+Review(
+    email PK/FK,
+    rest_phone PK/FK,
+    rating,
+    comment,
+    review_created
+)
+
+ReservationHistory(
+    res_num PK/FK,
+    changed_at PK,
+    changed_to,
+    changed_by
+)
