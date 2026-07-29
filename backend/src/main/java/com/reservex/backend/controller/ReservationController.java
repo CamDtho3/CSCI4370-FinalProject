@@ -34,32 +34,38 @@ public class ReservationController {
         return reservationService.getReservationsForDiner(AuthSession.requireEmail(session));
     }
 
-    // GET reservations by restaurant phone and date
+    // GET reservations by restaurant phone and date — staff at that restaurant only
     @GetMapping("/restaurant/{restPhone}")
     public List<ReservationResponse> getReservationsByRestaurantAndDate(
             @PathVariable String restPhone,
-            @RequestParam LocalDate slotDate) {
+            @RequestParam LocalDate slotDate,
+            HttpSession session) {
 
-        return reservationService.getReservationsByRestaurantAndDate(restPhone, slotDate);
+        return reservationService.getReservationsByRestaurantAndDate(
+                restPhone, slotDate, AuthSession.requireEmail(session));
     }
 
 
     // GET reservations by restaurant phone and date, staff-shaped (guest identity + history)
+    // — staff at that restaurant only, carries diner names/emails/phones
     @GetMapping("/restaurant/{restPhone}/staff")
     public List<StaffReservationResponse> getStaffReservationsByRestaurantAndDate(
             @PathVariable String restPhone,
-            @RequestParam LocalDate slotDate) {
+            @RequestParam LocalDate slotDate,
+            HttpSession session) {
 
-        return reservationService.getStaffReservationsForRestaurantAndDate(restPhone, slotDate);
+        return reservationService.getStaffReservationsForRestaurantAndDate(
+                restPhone, slotDate, AuthSession.requireEmail(session));
     }
 
 
-    // GET reservation by ID
+    // GET reservation by ID — the diner who booked it, or staff at that restaurant
     @GetMapping("/{id}")
     public ReservationResponse getReservationById(
-            @PathVariable Integer id) {
+            @PathVariable Integer id,
+            HttpSession session) {
 
-        return ReservationResponse.from(reservationService.getReservationEntity(id));
+        return reservationService.getReservationForUser(id, AuthSession.requireEmail(session));
     }
 
 
@@ -95,12 +101,13 @@ public class ReservationController {
     }
 
 
-    // DELETE reservation
+    // DELETE reservation — the diner who booked it, or staff at that restaurant
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservation(
-            @PathVariable Integer id) {
+            @PathVariable Integer id,
+            HttpSession session) {
 
-        reservationService.deleteReservation(id);
+        reservationService.deleteReservation(id, AuthSession.requireEmail(session));
         return ResponseEntity.noContent().build();
     }
 }

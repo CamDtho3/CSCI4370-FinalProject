@@ -64,9 +64,13 @@ public class ReservationService {
                 .toList();
     }
 
+    /** Raw booking counts/times for a restaurant's day — business data, staff only. */
     public List<ReservationResponse> getReservationsByRestaurantAndDate(
             String restPhone,
-            LocalDate slotDate) {
+            LocalDate slotDate,
+            String actingEmail) {
+        userAccountService.requireStaffAt(actingEmail, restPhone);
+
         return reservationRepository
                 .findByRestaurant_RestPhoneAndSlotDateOrderBySlotTimeAsc(restPhone, slotDate)
                 .stream()
@@ -75,9 +79,14 @@ public class ReservationService {
     }
 
 
-    /** What staff see for a service — guest identity and full status history included. */
+    /**
+     * What staff see for a service — guest identity and full status history
+     * included, so only staff at this restaurant may call it.
+     */
     public List<StaffReservationResponse> getStaffReservationsForRestaurantAndDate(
-            String restPhone, LocalDate slotDate) {
+            String restPhone, LocalDate slotDate, String actingEmail) {
+        userAccountService.requireStaffAt(actingEmail, restPhone);
+
         return reservationRepository
                 .findByRestaurant_RestPhoneAndSlotDateOrderBySlotTimeAsc(restPhone, slotDate)
                 .stream()
@@ -90,6 +99,15 @@ public class ReservationService {
     public Reservation getReservationEntity(Integer resNum) {
         return reservationRepository.findById(resNum)
                 .orElseThrow(() -> ApiException.notFound("NOT_FOUND", "That reservation no longer exists."));
+    }
+
+
+    /** A single reservation's detail view — the diner who booked it, or staff at that restaurant. */
+    public ReservationResponse getReservationForUser(Integer resNum, String actingEmail) {
+        Reservation reservation = getReservationEntity(resNum);
+        UserAccount actingUser = userAccountService.getUserEntity(actingEmail);
+        authorizeEdit(reservation, actingUser); // same rule: owner or staff at this restaurant
+        return ReservationResponse.from(reservation);
     }
 
 
@@ -195,8 +213,10 @@ public class ReservationService {
     }
 
 
-    public void deleteReservation(Integer id) {
-        getReservationEntity(id); // 404 if missing
+    public void deleteReservation(Integer id, String actingEmail) {
+        Reservation reservation = getReservationEntity(id); // 404 if missing
+        UserAccount actingUser = userAccountService.getUserEntity(actingEmail);
+        authorizeEdit(reservation, actingUser); // same rule: owner or staff at this restaurant
         reservationRepository.deleteById(id);
     }
 

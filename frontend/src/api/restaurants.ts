@@ -46,12 +46,14 @@ export async function getRestaurantHoursByPhone(
   return (await response.json()) as OperationHoursResponse
 }
 
+/** Staff-only — see ReservationController.getReservationsByRestaurantAndDate. */
 export async function getReservationsByRestaurantAndDate(
   restPhone: string,
   slotDate: string,
 ): Promise<ReservationResponse[]> {
   const response = await fetch(
     `/api/reservations/restaurant/${encodeURIComponent(restPhone)}?slotDate=${encodeURIComponent(slotDate)}`,
+    { credentials: 'same-origin' },
   )
 
   if (!response.ok) {
