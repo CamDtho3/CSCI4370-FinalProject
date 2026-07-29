@@ -1,4 +1,11 @@
 package com.reservex.backend.dto;
 
-public record ReservationHistoryRequest(Integer resNum, String changedTo, String changedByEmail) {
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+public record ReservationHistoryRequest(
+    @NotNull Integer resNum,
+    @NotBlank String changedTo,
+    @NotBlank @Email String changedByEmail) {
 }

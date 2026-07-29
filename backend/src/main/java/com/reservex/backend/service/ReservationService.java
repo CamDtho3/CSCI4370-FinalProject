@@ -133,6 +133,7 @@ public class ReservationService {
 
 
     public void deleteReservation(Integer id) {
+        getReservationEntity(id); // 404 if missing
         reservationRepository.deleteById(id);
     }
 

@@ -5,6 +5,7 @@ import com.reservex.backend.dto.ReservationSlotResponse;
 import com.reservex.backend.entity.ReservationSlotId;
 import com.reservex.backend.service.ReservationSlotService;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +35,7 @@ public class ReservationSlotController {
     // POST http://localhost:8080/api/reservation-slots
     @PostMapping
     public ResponseEntity<ReservationSlotResponse> createSlot(
-            @RequestBody ReservationSlotRequest slot) {
+            @Valid @RequestBody ReservationSlotRequest slot) {
 
         return ResponseEntity.ok(
                 reservationSlotService.createSlot(slot)

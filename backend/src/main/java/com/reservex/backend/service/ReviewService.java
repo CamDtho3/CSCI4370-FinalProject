@@ -1,5 +1,6 @@
 package com.reservex.backend.service;
 
+import com.reservex.backend.common.exception.ApiException;
 import com.reservex.backend.dto.ReviewRequest;
 import com.reservex.backend.dto.ReviewResponse;
 import com.reservex.backend.entity.Review;
@@ -55,6 +56,8 @@ public class ReviewService {
 
 
     public void deleteReview(ReviewId id) {
+        reviewRepository.findById(id)
+                .orElseThrow(() -> ApiException.notFound("NOT_FOUND", "That review no longer exists."));
         reviewRepository.deleteById(id);
     }
 }

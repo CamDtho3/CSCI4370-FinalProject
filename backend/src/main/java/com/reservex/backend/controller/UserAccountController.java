@@ -4,6 +4,8 @@ import com.reservex.backend.dto.UserAccountRequest;
 import com.reservex.backend.dto.UserAccountResponse;
 import com.reservex.backend.service.UserAccountService;
 
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,7 +43,7 @@ public class UserAccountController {
     // CREATE user
     @PostMapping
     public UserAccountResponse createUser(
-            @RequestBody UserAccountRequest user) {
+            @Valid @RequestBody UserAccountRequest user) {
 
         return userAccountService.createUser(user);
     }
@@ -49,9 +51,10 @@ public class UserAccountController {
 
     // DELETE user
     @DeleteMapping("/{email}")
-    public void deleteUser(
+    public ResponseEntity<Void> deleteUser(
             @PathVariable String email) {
 
         userAccountService.deleteUser(email);
+        return ResponseEntity.noContent().build();
     }
 }

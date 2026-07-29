@@ -1,8 +1,10 @@
 package com.reservex.backend.service;
 
+import com.reservex.backend.common.exception.ApiException;
 import com.reservex.backend.dto.RestaurantHoursRequest;
 import com.reservex.backend.dto.RestaurantHoursResponse;
 import com.reservex.backend.entity.RestaurantHours;
+import com.reservex.backend.entity.RestaurantHoursId;
 import com.reservex.backend.repository.RestaurantHoursRepository;
 
 import java.util.List;
@@ -33,6 +35,13 @@ public class RestaurantHoursService {
     }
 
 
+    public RestaurantHours getHoursEntity(RestaurantHoursId id) {
+        return restaurantHoursRepository.findById(id)
+                .orElseThrow(() -> ApiException.notFound(
+                        "NOT_FOUND", "Those restaurant hours no longer exist."));
+    }
+
+
     // CREATE hours
     public RestaurantHoursResponse createHours(RestaurantHoursRequest req) {
         RestaurantHours hours = new RestaurantHours();
@@ -46,8 +55,9 @@ public class RestaurantHoursService {
     }
 
 
-    // DELETE hours
-    public void deleteHours(RestaurantHours hours) {
-        restaurantHoursRepository.delete(hours);
+    // DELETE hours — by composite key, not the full entity
+    public void deleteHours(RestaurantHoursId id) {
+        getHoursEntity(id); // 404 if missing
+        restaurantHoursRepository.deleteById(id);
     }
 }

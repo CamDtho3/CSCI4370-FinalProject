@@ -85,6 +85,7 @@ public class UserAccountService {
 
     // DELETE user
     public void deleteUser(String email) {
+        getUserEntity(email); // 404 if missing
         userAccountRepository.deleteById(email);
     }
 }

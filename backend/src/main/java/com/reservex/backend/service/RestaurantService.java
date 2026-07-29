@@ -67,6 +67,7 @@ public class RestaurantService {
 
     // DELETE restaurant
     public void deleteRestaurant(String restPhone) {
+        getRestaurantEntity(restPhone); // 404 if missing
         restaurantRepository.deleteById(restPhone);
     }
 

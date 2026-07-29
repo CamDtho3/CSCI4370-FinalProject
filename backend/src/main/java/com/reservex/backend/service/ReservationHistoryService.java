@@ -1,5 +1,6 @@
 package com.reservex.backend.service;
 
+import com.reservex.backend.common.exception.ApiException;
 import com.reservex.backend.dto.ReservationHistoryRequest;
 import com.reservex.backend.dto.ReservationHistoryResponse;
 import com.reservex.backend.entity.ReservationHistory;
@@ -54,6 +55,8 @@ public class ReservationHistoryService {
 
 
     public void deleteHistory(ReservationHistoryId id) {
+        repository.findById(id)
+                .orElseThrow(() -> ApiException.notFound("NOT_FOUND", "That history entry no longer exists."));
         repository.deleteById(id);
     }
 }

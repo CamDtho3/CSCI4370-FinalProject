@@ -4,6 +4,8 @@ import com.reservex.backend.dto.RestaurantRequest;
 import com.reservex.backend.dto.RestaurantResponse;
 import com.reservex.backend.service.RestaurantService;
 
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,7 +45,7 @@ public class RestaurantController {
     // CREATE restaurant
     @PostMapping
     public RestaurantResponse createRestaurant(
-            @RequestBody RestaurantRequest restaurant) {
+            @Valid @RequestBody RestaurantRequest restaurant) {
 
         return restaurantService.createRestaurant(restaurant);
     }
@@ -51,10 +53,11 @@ public class RestaurantController {
 
     // DELETE restaurant
     @DeleteMapping("/{restPhone}")
-    public void deleteRestaurant(
+    public ResponseEntity<Void> deleteRestaurant(
             @PathVariable String restPhone) {
 
         restaurantService.deleteRestaurant(restPhone);
+        return ResponseEntity.noContent().build();
     }
 
 }

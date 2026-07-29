@@ -5,6 +5,8 @@ import com.reservex.backend.dto.ReviewResponse;
 import com.reservex.backend.entity.ReviewId;
 import com.reservex.backend.service.ReviewService;
 
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,7 +33,7 @@ public class ReviewController {
     // POST create review
     @PostMapping
     public ReviewResponse createReview(
-            @RequestBody ReviewRequest review) {
+            @Valid @RequestBody ReviewRequest review) {
 
         return reviewService.createReview(review);
     }
@@ -39,9 +41,10 @@ public class ReviewController {
 
     // DELETE review using composite key
     @DeleteMapping
-    public void deleteReview(
+    public ResponseEntity<Void> deleteReview(
             @RequestBody ReviewId id) {
 
         reviewService.deleteReview(id);
+        return ResponseEntity.noContent().build();
     }
 }

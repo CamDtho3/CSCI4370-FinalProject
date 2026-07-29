@@ -1,7 +1,12 @@
 package com.reservex.backend.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalTime;
 
 public record RestaurantHoursRequest(
-    String restPhone, String dayOfWeek, LocalTime openTime, LocalTime closeTime, Boolean isClosed) {
+    @NotBlank String restPhone,
+    @NotBlank String dayOfWeek,
+    LocalTime openTime,
+    LocalTime closeTime,
+    Boolean isClosed) {
 }

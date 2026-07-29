@@ -5,6 +5,8 @@ import com.reservex.backend.dto.ReservationHistoryResponse;
 import com.reservex.backend.entity.ReservationHistoryId;
 import com.reservex.backend.service.ReservationHistoryService;
 
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,7 +33,7 @@ public class ReservationHistoryController {
     // POST create reservation history record
     @PostMapping
     public ReservationHistoryResponse createHistory(
-            @RequestBody ReservationHistoryRequest history) {
+            @Valid @RequestBody ReservationHistoryRequest history) {
 
         return reservationHistoryService.createHistory(history);
     }
@@ -39,9 +41,10 @@ public class ReservationHistoryController {
 
     // DELETE reservation history record
     @DeleteMapping
-    public void deleteHistory(
+    public ResponseEntity<Void> deleteHistory(
             @RequestBody ReservationHistoryId id) {
 
         reservationHistoryService.deleteHistory(id);
+        return ResponseEntity.noContent().build();
     }
 }

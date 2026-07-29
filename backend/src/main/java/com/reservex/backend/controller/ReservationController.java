@@ -4,6 +4,9 @@ import com.reservex.backend.dto.ReservationRequest;
 import com.reservex.backend.dto.ReservationResponse;
 import com.reservex.backend.dto.ReservationStatusUpdateRequest;
 import com.reservex.backend.service.ReservationService;
+
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,7 +42,7 @@ public class ReservationController {
     // POST create reservation — capacity-checked, writes the first history row
     @PostMapping
     public ReservationResponse createReservation(
-            @RequestBody ReservationRequest reservation) {
+            @Valid @RequestBody ReservationRequest reservation) {
 
         return reservationService.createReservation(reservation);
     }
@@ -49,7 +52,7 @@ public class ReservationController {
     @PatchMapping("/{id}/status")
     public ReservationResponse updateStatus(
             @PathVariable Integer id,
-            @RequestBody ReservationStatusUpdateRequest update) {
+            @Valid @RequestBody ReservationStatusUpdateRequest update) {
 
         return reservationService.transitionStatus(id, update.toStatus(), update.changedByEmail());
     }
@@ -57,9 +60,10 @@ public class ReservationController {
 
     // DELETE reservation
     @DeleteMapping("/{id}")
-    public void deleteReservation(
+    public ResponseEntity<Void> deleteReservation(
             @PathVariable Integer id) {
 
         reservationService.deleteReservation(id);
+        return ResponseEntity.noContent().build();
     }
 }

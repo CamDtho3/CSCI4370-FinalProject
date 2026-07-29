@@ -74,6 +74,7 @@ public class ReservationSlotService {
     // DELETE reservation slot
     public void deleteSlot(ReservationSlotId id) {
 
+        getSlotEntity(id); // 404 if missing
         reservationSlotRepository.deleteById(id);
     }
 
