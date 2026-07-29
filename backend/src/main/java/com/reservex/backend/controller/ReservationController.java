@@ -32,7 +32,7 @@ public class ReservationController {
 
     // GET reservations by restaurant phone and date
     @GetMapping("/restaurant/{restPhone}")
-    public List<Reservation> getReservationsByRestaurantAndDate(
+    public List<ReservationResponse> getReservationsByRestaurantAndDate(
             @PathVariable String restPhone,
             @RequestParam LocalDate slotDate) {
 

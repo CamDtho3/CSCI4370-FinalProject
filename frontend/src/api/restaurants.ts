@@ -53,38 +53,6 @@ export async function getReservationsByRestaurantAndDate(
   return (await response.json()) as ReservationResponse[]
 }
 
-function generateTimeSlots(startTime: string, endTime: string): string[] {
-  const timeSlots: string[] = [];
-
-  // Helper function to convert "HH:MM" string to total minutes
-  const timeToMinutes = (timeStr: string): number => {
-    const [hours, minutes] = timeStr.split(':').map(Number);
-    return hours * 60 + minutes;
-  };
-
-  // Helper function to convert total minutes back to "HH:MM" string
-  const minutesToTime = (totalMinutes: number): string => {
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-  };
-
-  const startMinutes = timeToMinutes(startTime);
-  const endMinutes = timeToMinutes(endTime);
-
-  // Loop in 15-minute increments
-  for (let minutes = startMinutes; minutes <= endMinutes; minutes += 15) {
-    timeSlots.push(minutesToTime(minutes));
-  }
-
-  return timeSlots;
-}
-
-function getDayName(dateString: string): string {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { weekday: 'long' });
-}
-
 export function RestaurantsWithSlots(
   slotDate: string,
 ): RestaurantWithSlots[] {
@@ -94,36 +62,25 @@ export function RestaurantsWithSlots(
   }))
 }
 
+/**
+ * Slots come straight from the reservation_slot table — slotCapacity is
+ * whatever the restaurant actually configured, and availableSpots is
+ * computed server-side from real bookings. Nothing about capacity or
+ * open/close times gets invented on the client.
+ */
 export async function SlotsFor(
   restPhone: string,
   slotDate: string,
 ): Promise<TimeSlotResponse[]> {
-  const dayOfWeek = getDayName(slotDate)
-  const hours = await findRestaurantHours(restPhone, dayOfWeek)
-  if (!hours || hours.isClosed) return []
+  const response = await fetch(
+    `/api/reservation-slots/restaurant/${encodeURIComponent(restPhone)}?slotDate=${encodeURIComponent(slotDate)}`,
+  )
 
-  const slotTimes = generateTimeSlots(hours.openTime, hours.closeTime)
-  const reservations = await getReservationsByRestaurantAndDate(restPhone, slotDate)
-  const bookedTimes = reservations.map((r) => r.slotTime)
-  const openTimes = slotTimes.filter((time) => !bookedTimes.includes(time))
-  const bookingsByTime = new Map<string, number>()
-
-  for (const r of reservations) {
-    bookingsByTime.set(r.slotTime, (bookingsByTime.get(r.slotTime) ?? 0) + r.partySize)
+  if (!response.ok) {
+    throw new Error(`Failed to load slots for ${restPhone} on ${slotDate}`)
   }
 
-  const timeSlots: TimeSlotResponse[] = openTimes.map((slotTime) => {
-    const slotCapacity = 5
-    const booked = bookingsByTime.get(slotTime) ?? 0
-
-    return {
-      slotDate,
-      slotTime,
-      slotCapacity,
-      availableSpots: Math.max(0, slotCapacity - booked),
-    }
-  })
-  return timeSlots
+  return (await response.json()) as TimeSlotResponse[]
 }
 export async function findRestaurant(
   restPhone: string,

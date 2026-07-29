@@ -10,6 +10,7 @@ import com.reservex.backend.entity.UserAccount;
 import com.reservex.backend.repository.ReservationHistoryRepository;
 import com.reservex.backend.repository.ReservationRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -60,11 +61,14 @@ public class ReservationService {
                 .toList();
     }
 
-    public List<Reservation> getReservationsByRestaurantAndDate(
+    public List<ReservationResponse> getReservationsByRestaurantAndDate(
             String restPhone,
             LocalDate slotDate) {
         return reservationRepository
-                .findByRestaurant_RestPhoneAndSlotDateOrderBySlotTimeAsc(restPhone, slotDate);
+                .findByRestaurant_RestPhoneAndSlotDateOrderBySlotTimeAsc(restPhone, slotDate)
+                .stream()
+                .map(ReservationResponse::from)
+                .toList();
     }
 
 

@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -28,6 +29,18 @@ public class ReservationSlotController {
     @GetMapping
     public ResponseEntity<List<ReservationSlotResponse>> getAllSlots() {
         return ResponseEntity.ok(reservationSlotService.getAllSlots());
+    }
+
+
+    // GET the slots for one restaurant on one date
+    // GET http://localhost:8080/api/reservation-slots/restaurant/{restPhone}?slotDate=2026-07-29
+    @GetMapping("/restaurant/{restPhone}")
+    public ResponseEntity<List<ReservationSlotResponse>> getSlotsForRestaurantAndDate(
+            @PathVariable String restPhone,
+            @RequestParam LocalDate slotDate) {
+
+        return ResponseEntity.ok(
+                reservationSlotService.getSlotsForRestaurantAndDate(restPhone, slotDate));
     }
 
 

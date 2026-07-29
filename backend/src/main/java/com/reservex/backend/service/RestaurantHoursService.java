@@ -1,13 +1,12 @@
 package com.reservex.backend.service;
 
 import com.reservex.backend.common.exception.ApiException;
+import com.reservex.backend.dto.OperationHoursResponse;
 import com.reservex.backend.dto.RestaurantHoursRequest;
 import com.reservex.backend.dto.RestaurantHoursResponse;
 import com.reservex.backend.entity.RestaurantHours;
 import com.reservex.backend.entity.RestaurantHoursId;
 import com.reservex.backend.repository.RestaurantHoursRepository;
-
-import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;

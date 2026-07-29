@@ -1,12 +1,12 @@
 package com.reservex.backend.controller;
 
+import com.reservex.backend.dto.OperationHoursResponse;
 import com.reservex.backend.dto.RestaurantHoursRequest;
 import com.reservex.backend.dto.RestaurantHoursResponse;
 import com.reservex.backend.entity.RestaurantHoursId;
 import com.reservex.backend.service.RestaurantHoursService;
 
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +15,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/restaurant-hours")
-@CrossOrigin(origins = "*")
 public class RestaurantHoursController {
 
 

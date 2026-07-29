@@ -43,6 +43,16 @@ public class ReservationSlotService {
     }
 
 
+    // GET the slots for one restaurant on one date, in time order
+    public List<ReservationSlotResponse> getSlotsForRestaurantAndDate(String restPhone, LocalDate slotDate) {
+        return reservationSlotRepository
+                .findByRestaurant_RestPhoneAndSlotDateOrderBySlotTimeAsc(restPhone, slotDate)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+
     // GET one reservation slot
     public ReservationSlot getSlotEntity(ReservationSlotId id) {
         return reservationSlotRepository.findById(id)
