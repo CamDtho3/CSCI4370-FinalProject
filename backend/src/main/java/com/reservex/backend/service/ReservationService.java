@@ -1,8 +1,10 @@
 package com.reservex.backend.service;
 
 import com.reservex.backend.common.exception.ApiException;
+import com.reservex.backend.dto.ReservationEditRequest;
 import com.reservex.backend.dto.ReservationRequest;
 import com.reservex.backend.dto.ReservationResponse;
+import com.reservex.backend.dto.StaffReservationResponse;
 import com.reservex.backend.entity.Reservation;
 import com.reservex.backend.entity.ReservationHistory;
 import com.reservex.backend.entity.Restaurant;
@@ -68,6 +70,18 @@ public class ReservationService {
                 .findByRestaurant_RestPhoneAndSlotDateOrderBySlotTimeAsc(restPhone, slotDate)
                 .stream()
                 .map(ReservationResponse::from)
+                .toList();
+    }
+
+
+    /** What staff see for a service — guest identity and full status history included. */
+    public List<StaffReservationResponse> getStaffReservationsForRestaurantAndDate(
+            String restPhone, LocalDate slotDate) {
+        return reservationRepository
+                .findByRestaurant_RestPhoneAndSlotDateOrderBySlotTimeAsc(restPhone, slotDate)
+                .stream()
+                .map(r -> StaffReservationResponse.from(
+                        r, reservationHistoryRepository.findByReservation_ResNumOrderByChangedAtAsc(r.getResNum())))
                 .toList();
     }
 
@@ -140,6 +154,39 @@ public class ReservationService {
         writeHistory(saved, toStatus, changedBy);
 
         return ReservationResponse.from(saved);
+    }
+
+
+    /**
+     * Edits party size, slot, and/or special request. Restaurant and diner
+     * are fixed. Re-runs the capacity check against the new slot, excluding
+     * this reservation's own current party — its seats are being released,
+     * not double-booked. Writes no history row: an edit is not a status
+     * transition.
+     */
+    @Transactional
+    public ReservationResponse updateReservation(Integer resNum, ReservationEditRequest req) {
+        Reservation reservation = getReservationEntity(resNum);
+        String restPhone = reservation.getRestaurant().getRestPhone();
+        var slot = reservationSlotService.getSlotEntity(restPhone, req.slotDate(), req.slotTime());
+
+        int alreadyBooked = reservationRepository.sumPartySizeForSlotExcluding(
+                restPhone, req.slotDate(), req.slotTime(), INACTIVE_STATUSES, resNum);
+        int remaining = slot.getSlotCapacity() - alreadyBooked;
+
+        if (req.partySize() > remaining) {
+            String message = remaining > 0
+                    ? "Only " + remaining + (remaining == 1 ? " seat" : " seats") + " remain at that time."
+                    : "That time just filled up.";
+            throw ApiException.conflict("SLOT_FULL", message);
+        }
+
+        reservation.setSlotDate(req.slotDate());
+        reservation.setSlotTime(req.slotTime());
+        reservation.setPartySize(req.partySize());
+        reservation.setSpecialReq(req.specialReq());
+
+        return ReservationResponse.from(reservationRepository.save(reservation));
     }
 
 

@@ -1,20 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import type { ReservationStatus, StaffReservationResponse } from '../api/types'
 import { Button, ReservationBadge } from '../components/ui'
-import {
-  ALLOWED_TRANSITIONS,
-  STATUS_ACTION_LABEL,
-  listStaffReservations,
-  remainingAtStaffSlot,
-  summarise,
-  transitionStaffReservation,
-  updateStaffReservation,
-} from '../mocks/staff'
+import { ALLOWED_TRANSITIONS, STATUS_ACTION_LABEL, remainingAtStaffSlot, summarise } from '../mocks/staff'
+import { getStaffReservations } from '../api/staff'
+import { transitionReservationStatus, updateReservation, ApiError } from '../api/reservations'
 import EditReservation from '../components/EditReservation'
 import type { ReservationEdit } from '../components/EditReservation'
-import { MockApiError } from '../mocks/reservations'
 import { formatTime } from '../lib/time'
 import styles from './StaffToday.module.css'
 
@@ -50,7 +43,7 @@ function ReservationRow({
     try {
       await onTransition(to)
     } catch (err) {
-      setError(err instanceof MockApiError ? err.message : 'Could not update.')
+      setError(err instanceof ApiError ? err.message : 'Could not update.')
     } finally {
       setBusy(false)
     }
@@ -160,20 +153,43 @@ export default function StaffToday() {
     new Date().toISOString().slice(0, 10),
   )
   const [version, setVersion] = useState(0)
+  const [reservations, setReservations] = useState<StaffReservationResponse[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!isStaff) return
+
+    let active = true
+
+    setLoading(true)
+    getStaffReservations(STAFF_REST_PHONE, slotDate)
+      .then((result) => {
+        if (active) setReservations(result)
+      })
+      .catch(() => {
+        if (active) setReservations([])
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+
+    return () => {
+      active = false
+    }
+    // version bumps after a transition/edit to trigger a re-fetch
+  }, [slotDate, isStaff, version])
 
   if (!isStaff) return <Navigate to="/" replace />
 
-  const reservations = listStaffReservations(STAFF_REST_PHONE, slotDate)
   const stats = summarise(reservations)
-  void version // re-render key after a transition mutates the store
 
   async function handleTransition(resNum: string, to: ReservationStatus) {
-    await transitionStaffReservation(resNum, to, user!.email)
+    await transitionReservationStatus(resNum, to, user!.email)
     setVersion((v) => v + 1)
   }
 
   async function handleEdit(resNum: string, next: ReservationEdit) {
-    await updateStaffReservation(resNum, next)
+    await updateReservation(resNum, next)
     setVersion((v) => v + 1)
   }
 
@@ -218,7 +234,9 @@ export default function StaffToday() {
         </div>
       </div>
 
-      {reservations.length === 0 ? (
+      {loading ? (
+        <p className={styles.empty}>Loading…</p>
+      ) : reservations.length === 0 ? (
         <p className={styles.empty}>No bookings for this date.</p>
       ) : (
         <div className={styles.list}>

@@ -1,8 +1,10 @@
 package com.reservex.backend.controller;
 
+import com.reservex.backend.dto.ReservationEditRequest;
 import com.reservex.backend.dto.ReservationRequest;
 import com.reservex.backend.dto.ReservationResponse;
 import com.reservex.backend.dto.ReservationStatusUpdateRequest;
+import com.reservex.backend.dto.StaffReservationResponse;
 import com.reservex.backend.service.ReservationService;
 
 import jakarta.validation.Valid;
@@ -40,6 +42,16 @@ public class ReservationController {
     }
 
 
+    // GET reservations by restaurant phone and date, staff-shaped (guest identity + history)
+    @GetMapping("/restaurant/{restPhone}/staff")
+    public List<StaffReservationResponse> getStaffReservationsByRestaurantAndDate(
+            @PathVariable String restPhone,
+            @RequestParam LocalDate slotDate) {
+
+        return reservationService.getStaffReservationsForRestaurantAndDate(restPhone, slotDate);
+    }
+
+
     // GET reservation by ID
     @GetMapping("/{id}")
     public ReservationResponse getReservationById(
@@ -65,6 +77,16 @@ public class ReservationController {
             @Valid @RequestBody ReservationStatusUpdateRequest update) {
 
         return reservationService.transitionStatus(id, update.toStatus(), update.changedByEmail());
+    }
+
+
+    // PATCH edit party size/slot/special request — capacity-checked, no history row
+    @PatchMapping("/{id}")
+    public ReservationResponse updateReservation(
+            @PathVariable Integer id,
+            @Valid @RequestBody ReservationEditRequest edit) {
+
+        return reservationService.updateReservation(id, edit);
     }
 
 

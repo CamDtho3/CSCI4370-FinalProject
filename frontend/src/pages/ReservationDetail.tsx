@@ -3,11 +3,16 @@ import { useLocation, useNavigate, useParams, useSearchParams } from 'react-rout
 import { useAuth } from '../context/AuthContext'
 import type { ReservationResponse } from '../api/types'
 import { Button, ReservationBadge } from '../components/ui'
-import { cancelReservation, findReservation, isCancellable, ApiError } from '../api/reservations'
-// Editing isn't backed by a real endpoint yet, so it still runs on the
-// mock — including remainingAtSlot's capacity check, which can't see
-// bookings made through the real API. See api/reservations.ts.
-import { remainingAtSlot, updateMockReservation } from '../mocks/reservations'
+import {
+  cancelReservation,
+  findReservation,
+  isCancellable,
+  updateReservation,
+  ApiError,
+} from '../api/reservations'
+// The edit panel's slot picker still previews mock availability — see
+// the note in api/reservations.ts. The save itself is real.
+import { remainingAtSlot } from '../mocks/reservations'
 import EditReservation from '../components/EditReservation'
 import type { ReservationEdit } from '../components/EditReservation'
 import { findRestaurant } from '../api/restaurants'
@@ -186,7 +191,7 @@ export default function ReservationDetail() {
   const cancellable = isCancellable(reservation)
 
   async function handleSave(next: ReservationEdit) {
-    const updated = await updateMockReservation(resNum, next)
+    const updated = await updateReservation(resNum, next)
     setReservation({ ...updated })
     stopEditing()
   }

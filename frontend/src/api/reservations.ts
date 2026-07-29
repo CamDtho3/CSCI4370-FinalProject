@@ -3,10 +3,11 @@ import type { ReservationResponse, ReservationRequest, ReservationStatus } from 
 /* ===================================================================
    Real reservation client — talks to POST/GET/PATCH /api/reservations.
 
-   Editing an existing reservation (party size/slot/special request) has
-   no backend endpoint yet, so that flow still runs against
-   mocks/reservations.ts (updateMockReservation/remainingAtSlot) until
-   that's built.
+   updateReservation below saves edits for real. The edit panel's slot
+   picker (mocks/reservations.ts::remainingAtSlot) still shows mock
+   availability while choosing a time — it can't see real bookings — but
+   the save itself is capacity-checked server-side regardless, so a bad
+   pick is rejected with a real SLOT_FULL rather than silently accepted.
    =================================================================== */
 
 /** Mirrors the ErrorResponse shape GlobalExceptionHandler returns. */
@@ -21,7 +22,7 @@ export class ApiError extends Error {
   }
 }
 
-async function throwApiError(response: Response): Promise<never> {
+export async function throwApiError(response: Response): Promise<never> {
   const body = await response.json().catch(() => null)
   throw new ApiError(
     response.status,
@@ -112,22 +113,61 @@ export async function listReservations(): Promise<ReservationResponse[]> {
 }
 
 /**
- * Cancels a booking via the status-transition endpoint. Server-side this
- * is not a delete: the row stays and a ReservationHistory entry records
- * who cancelled it and when — that trail is what settles "I cancelled in
- * time" disputes.
+ * Moves a reservation to any target status via the status-transition
+ * endpoint. Server-side this is not a delete: the row stays and a
+ * ReservationHistory entry records who made the change and when — that
+ * trail is what settles "I cancelled in time" disputes, and what staff's
+ * status history view reads from.
  *
  * changedByEmail is the same auth stand-in as createReservation's
  * dinerEmail.
  */
-export async function cancelReservation(
+export async function transitionReservationStatus(
   resNum: string,
+  toStatus: ReservationStatus,
   changedByEmail: string,
 ): Promise<ReservationResponse> {
   const response = await fetch(`/api/reservations/${encodeURIComponent(resNum)}/status`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ toStatus: 'CANCELLED', changedByEmail }),
+    body: JSON.stringify({ toStatus, changedByEmail }),
+  })
+
+  if (!response.ok) await throwApiError(response)
+  return toReservationResponse((await response.json()) as ReservationDto)
+}
+
+/** Convenience wrapper for the diner-facing cancel action. */
+export async function cancelReservation(
+  resNum: string,
+  changedByEmail: string,
+): Promise<ReservationResponse> {
+  return transitionReservationStatus(resNum, 'CANCELLED', changedByEmail)
+}
+
+/**
+ * Edits party size, slot, and/or special request, or throws ApiError
+ * with code SLOT_FULL if the new slot can't seat the party. No status
+ * transition, no history row — see ReservationService.updateReservation.
+ */
+export async function updateReservation(
+  resNum: string,
+  next: {
+    slotDate: string
+    slotTime: string
+    partySize: number
+    specialReq: string
+  },
+): Promise<ReservationResponse> {
+  const response = await fetch(`/api/reservations/${encodeURIComponent(resNum)}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      slotDate: next.slotDate,
+      slotTime: next.slotTime,
+      partySize: next.partySize,
+      specialReq: next.specialReq.trim() || null,
+    }),
   })
 
   if (!response.ok) await throwApiError(response)
