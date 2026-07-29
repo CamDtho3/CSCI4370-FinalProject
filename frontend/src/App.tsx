@@ -14,9 +14,6 @@ import StaffToday from './pages/StaffToday'
 import StaffAvailability from './pages/StaffAvailability'
 import NotFound from './pages/NotFound'
 
-// Placeholders — replace as each page gets built.
-const Stub = ({ name }: { name: string }) => <h1>{name}</h1>
-
 export default function App() {
   return (
     <BrowserRouter>

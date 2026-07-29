@@ -18,12 +18,13 @@ const reservations: ReservationResponse[] = []
 
 /** Mirrors the ApiError shape the real client throws. */
 export class MockApiError extends Error {
-  constructor(
-    readonly status: number,
-    readonly code: string,
-    message: string,
-  ) {
+  status: number
+  code: string
+
+  constructor(status: number, code: string, message: string) {
     super(message)
+    this.status = status
+    this.code = code
   }
 }
 
