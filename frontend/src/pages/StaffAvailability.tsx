@@ -7,8 +7,6 @@ import type { ReservationResponse, TimeSlotResponse } from '../api/types'
 import { formatTime, mealPeriodOf } from '../lib/time'
 import styles from './StaffAvailability.module.css'
 
-const STAFF_REST_PHONE = '706-549-3450'
-
 export default function StaffAvailability() {
   const { user, isStaff } = useAuth()
   const [slotDate, setSlotDate] = useState(() =>
@@ -16,15 +14,16 @@ export default function StaffAvailability() {
   )
   const [slots, setSlots] = useState<TimeSlotResponse[]>([])
   const [reservations, setReservations] = useState<ReservationResponse[]>([])
+  const employerPhone = user?.employerPhone
 
   useEffect(() => {
-    if (!isStaff) return
+    if (!isStaff || !employerPhone) return
 
     let active = true
 
     Promise.all([
-      SlotsFor(STAFF_REST_PHONE, slotDate),
-      getReservationsByRestaurantAndDate(STAFF_REST_PHONE, slotDate),
+      SlotsFor(employerPhone, slotDate),
+      getReservationsByRestaurantAndDate(employerPhone, slotDate),
     ])
       .then(([slotsResult, reservationsResult]) => {
         if (!active) return
@@ -40,9 +39,17 @@ export default function StaffAvailability() {
     return () => {
       active = false
     }
-  }, [slotDate, isStaff])
+  }, [slotDate, isStaff, employerPhone])
 
   if (!isStaff) return <Navigate to="/" replace />
+
+  if (!employerPhone) {
+    return (
+      <p className={styles.note}>
+        Your account isn't associated with a restaurant, so there's nothing to show here.
+      </p>
+    )
+  }
 
   const booked = reservations.filter(
     (r) => r.resStatus !== 'CANCELLED' && r.resStatus !== 'NO_SHOW',

@@ -11,8 +11,6 @@ import type { ReservationEdit } from '../components/EditReservation'
 import { formatTime } from '../lib/time'
 import styles from './StaffToday.module.css'
 
-const STAFF_REST_PHONE = '706-549-3450'
-
 function timeOfDay(iso: string): string {
   return new Date(iso).toLocaleTimeString('en-US', {
     hour: 'numeric',
@@ -155,14 +153,15 @@ export default function StaffToday() {
   const [version, setVersion] = useState(0)
   const [reservations, setReservations] = useState<StaffReservationResponse[]>([])
   const [loading, setLoading] = useState(true)
+  const employerPhone = user?.employerPhone
 
   useEffect(() => {
-    if (!isStaff) return
+    if (!isStaff || !employerPhone) return
 
     let active = true
 
     setLoading(true)
-    getStaffReservations(STAFF_REST_PHONE, slotDate)
+    getStaffReservations(employerPhone, slotDate)
       .then((result) => {
         if (active) setReservations(result)
       })
@@ -177,9 +176,17 @@ export default function StaffToday() {
       active = false
     }
     // version bumps after a transition/edit to trigger a re-fetch
-  }, [slotDate, isStaff, version])
+  }, [slotDate, isStaff, employerPhone, version])
 
   if (!isStaff) return <Navigate to="/" replace />
+
+  if (!employerPhone) {
+    return (
+      <p className={styles.empty}>
+        Your account isn't associated with a restaurant, so there's nothing to show here.
+      </p>
+    )
+  }
 
   const stats = summarise(reservations)
 

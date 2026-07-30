@@ -33,6 +33,9 @@ export interface CurrentUser {
    * (email → employer_phone). Absent for diners and platform admins.
    */
   employerName?: string
+  /** Same restaurant as employerName, as its natural key — the id staff
+   *  pages actually need to scope their API calls to. */
+  employerPhone?: string
 }
 
 export interface RestaurantResponse {
