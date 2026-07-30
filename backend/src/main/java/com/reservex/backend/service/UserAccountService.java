@@ -74,6 +74,16 @@ public class UserAccountService {
     }
 
 
+    /** Throws FORBIDDEN unless email is a STAFF account, at any restaurant. */
+    public UserAccount requireStaff(String email) {
+        UserAccount user = getUserEntity(email);
+        if (!"STAFF".equals(user.getUserRole())) {
+            throw ApiException.forbidden("FORBIDDEN", "Staff only.");
+        }
+        return user;
+    }
+
+
     /** Throws FORBIDDEN unless email is a STAFF account employed at restPhone. */
     public UserAccount requireStaffAt(String email, String restPhone) {
         UserAccount user = getUserEntity(email);

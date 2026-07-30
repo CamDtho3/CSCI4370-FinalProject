@@ -221,6 +221,19 @@ public class ReservationService {
     }
 
 
+    /**
+     * Shared "can touch this booking" check — the diner who made it, or
+     * staff at its restaurant. Exposed for ReservationHistoryService's
+     * manual entry point, which applies the same rule.
+     */
+    public UserAccount requireCanManage(Integer resNum, String actingEmail) {
+        Reservation reservation = getReservationEntity(resNum);
+        UserAccount actingUser = userAccountService.getUserEntity(actingEmail);
+        authorizeEdit(reservation, actingUser);
+        return actingUser;
+    }
+
+
     private void writeHistory(Reservation reservation, String status, UserAccount changedBy) {
         ReservationHistory history = new ReservationHistory();
         history.setReservation(reservation);

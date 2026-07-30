@@ -38,14 +38,14 @@ public class ReviewService {
     }
 
 
-    public ReviewResponse createReview(ReviewRequest req) {
+    public ReviewResponse createReview(ReviewRequest req, String reviewerEmail) {
         // Both throw NOT_FOUND themselves — confirms the FKs before we insert
         // rather than letting a bad reference surface as a raw 500.
-        userAccountService.getUserEntity(req.email());
+        userAccountService.getUserEntity(reviewerEmail);
         restaurantService.getRestaurantEntity(req.restPhone());
 
         Review review = new Review();
-        review.setEmail(req.email());
+        review.setEmail(reviewerEmail);
         review.setRestPhone(req.restPhone());
         review.setRating(req.rating());
         review.setComment(req.comment());
@@ -55,9 +55,15 @@ public class ReviewService {
     }
 
 
-    public void deleteReview(ReviewId id) {
+    /** Only the diner who wrote the review may delete it. */
+    public void deleteReview(ReviewId id, String actingEmail) {
         reviewRepository.findById(id)
                 .orElseThrow(() -> ApiException.notFound("NOT_FOUND", "That review no longer exists."));
+
+        if (!id.getEmail().equals(actingEmail)) {
+            throw ApiException.forbidden("FORBIDDEN", "You can only delete your own review.");
+        }
+
         reviewRepository.deleteById(id);
     }
 }
